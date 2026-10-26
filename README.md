@@ -2,6 +2,7 @@
 
 [![TikTok | Segui](assets/tiktok-segui.svg)](https://www.tiktok.com/@luigi.regolo)
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue?style=flat-square)](LICENSE)
+[![HACS](https://img.shields.io/badge/HACS-Repository-41BDF5?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
 [![GitHub Stars](https://img.shields.io/github/stars/luigi-regolo/smart-plugs-card?style=flat-square)](https://github.com/luigi-regolo/smart-plugs-card/stargazers)
 
 ## Overview
@@ -9,6 +10,12 @@
 **Smart Plugs Card** is a custom dashboard card for Home Assistant that brings multiple smart plugs into a compact, responsive interface inspired by the Edera Light and Graphite Dark styles.
 
 It displays each configured plug's current state, provides optional on/off controls, and shows power and energy readings when compatible sensors are available. The card uses existing Home Assistant entities and services; it does not communicate directly with smart plugs or require a separate cloud account.
+
+## Preview
+
+![Smart Plugs Card — Edera Graphite Dark preview](assets/smart-plugs-card-preview.png)
+
+*Smart Plugs Card in Graphite Dark mode. Names and readings depend on the Home Assistant configuration.*
 
 ## Features
 
@@ -20,9 +27,9 @@ It displays each configured plug's current state, provides optional on/off contr
 - **Power monitoring:** Display instantaneous power in W when a compatible `sensor.*` entity is configured (`W` and `kW` supported).
 - **Optional energy reading:** Display energy in kWh when a compatible energy sensor is configured (`Wh`, `kWh`, and `MWh` supported).
 - **Visual configuration:** Native Home Assistant entity selectors when available, with an entity-list fallback.
-- **Edera appearance:** Automatic, Light, and Graphite Dark themes; a grid or compact list layout; configurable Home Assistant MDI icons.
+- **Edera appearance:** Automatic, Light, and Graphite Dark themes; a subtle green tile highlight for active plugs in Light mode, and neutral tiles with green switches in Dark mode; configurable Home Assistant MDI icons.
 - **Optional headings:** Show or hide the upper label and main title independently.
-- **Responsive design:** Layout rules for narrow dashboard columns, smartphones, tablets, and desktops.
+- **Responsive design:** Two-column grid on supported narrow dashboard layouts, including smartphones, with a separate compact list option.
 - **No detail popups:** Switching and status information stay in the card itself.
 
 The available measurements and controls depend on the configured Home Assistant devices and integrations. Unknown or unavailable states are not interpreted as off.
@@ -31,7 +38,7 @@ The available measurements and controls depend on the configured Home Assistant 
 
 ### HACS — Custom repository
 
-Once this repository contains the published card files, use the **Custom repositories** option in HACS. The repository is not presented as an item in the default HACS catalog.
+Install Smart Plugs Card through **Custom repositories** in HACS. Choose the **Dashboard** repository category.
 
 1. Open **HACS** in Home Assistant.
 2. Open the HACS menu and choose **Custom repositories**.
