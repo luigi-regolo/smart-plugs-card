@@ -98,29 +98,42 @@ const SP_CSS=`
 *,*:before,*:after{box-sizing:border-box}button{font:inherit;cursor:pointer}button:disabled{cursor:not-allowed}
 ha-icon{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;--mdc-icon-size:21px;width:21px;height:21px;flex:none}
 .sp-root{--sp-bg:#fafbf9;--sp-tile:#f1f3ef;--sp-surface:#f0f2ef;--sp-line:#dfe5de;--sp-fg:#17261e;--sp-muted:#647569;--sp-accent:#096e53;--sp-on-bg:#edf7f0;--sp-on-line:#c8e5d3;--sp-on-soft:#dbf1e5;--sp-track:#d7e0d8;--sp-off:#e5e9e4;--sp-warn:#b67a2b;--sp-danger:#bc4444;background:var(--sp-bg);color:var(--sp-fg);border-radius:25px;border:1px solid var(--sp-line);padding:18px;min-width:0;container:sp-card/inline-size}
-.sp-root.sp-dark{--sp-bg:#101311;--sp-tile:#1a201c;--sp-surface:#1b211d;--sp-line:#303c33;--sp-fg:#f1f7f3;--sp-muted:#afbfb3;--sp-accent:#26b98b;--sp-on-bg:#172a20;--sp-on-line:#285641;--sp-on-soft:#1d4a35;--sp-track:#434d45;--sp-off:#333d35;--sp-warn:#e6b66c;--sp-danger:#ff8888}
+.sp-root.sp-dark{--sp-bg:#101211;--sp-tile:#191c1a;--sp-surface:#191c1a;--sp-line:#2b302c;--sp-fg:#f5f7f4;--sp-muted:#bbc5bd;--sp-accent:#0e795d;--sp-on-bg:#172a20;--sp-on-line:#285641;--sp-on-soft:#1d4a35;--sp-track:#434d45;--sp-off:#282b29;--sp-warn:#e6b66c;--sp-danger:#ff8888}
+.sp-dark .sp-orb{background:#282b29}.sp-dark .sp-plug.off{background:#191c1a}
 .sp-head{margin:2px 4px 17px}.sp-eyebrow{font-size:10px;letter-spacing:1.7px;font-weight:750;color:var(--sp-muted);margin-bottom:7px}.sp-title{font-size:25px;line-height:1.14;font-weight:780;letter-spacing:-.7px;overflow-wrap:anywhere}.sp-title span{color:var(--sp-accent);font-weight:800}
 .sp-summary{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:8px;margin-bottom:11px}
 .sp-summary-cell{min-width:0;background:var(--sp-surface);border:1px solid var(--sp-line);border-radius:15px;padding:13px 9px}
 .sp-summary-cell.major{background:var(--sp-on-bg);border-color:var(--sp-on-line)}
 .sp-summary-cell strong{display:block;font-size:29px;letter-spacing:-.7px;font-weight:650;line-height:1.15;font-variant-numeric:tabular-nums}.sp-summary-cell.major strong{color:var(--sp-accent)}
 .sp-summary-cell span{display:block;font-size:11.5px;line-height:1.4;color:var(--sp-muted);font-weight:400;margin-top:5px;overflow-wrap:break-word}
-.sp-sensorline{color:var(--sp-muted);margin:0 2px 14px;font-size:11.5px;line-height:1.4;display:flex;align-items:center;gap:5px;min-width:0}.sp-sensorline ha-icon{width:14px;height:14px;--mdc-icon-size:14px}.sp-sensorline span{min-width:0;overflow-wrap:anywhere}
+.sp-sensorline{color:var(--sp-muted);margin:0 2px 14px;font-size:11.5px;line-height:1.4;display:flex;align-items:center;gap:5px;min-width:0}.sp-sensorline ha-icon{width:14px;height:14px;--mdc-icon-size:14px}.sp-sensorline span{min-width:0;overflow-wrap:anywhere}.sp-sensorline strong{flex:none;margin-left:auto;color:var(--sp-fg);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .sp-grid-host{container:sp-grid/inline-size;min-width:0}
 .sp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .sp-plug{min-width:0;border:1px solid var(--sp-line);background:var(--sp-tile);border-radius:17px;min-height:153px;padding:13px 12px;display:flex;flex-direction:column}
 .sp-plug.on{background:var(--sp-on-bg);border-color:var(--sp-on-line)}.sp-plug.unknown{border-style:dashed}
+/* Edera Graphite Dark: active tiles remain neutral; only their switches turn green.
+   Edera Light intentionally retains its approved green active-tile wash. */
+.sp-root.sp-dark .sp-plug.on{background:var(--sp-tile);border-color:var(--sp-line)}
+.sp-root.sp-dark .sp-plug.on .sp-orb{background:var(--sp-off);color:var(--sp-fg)}
+.sp-root.sp-dark .sp-plug.on .sp-state{background:var(--sp-off);color:var(--sp-muted)}
+.sp-root.sp-dark .sp-plug.on .sp-dot{background:#88998c}
+.sp-root.sp-dark .sp-summary-cell.major{background:var(--sp-surface);border-color:var(--sp-line)}
+.sp-root.sp-dark .sp-summary-cell.major strong{color:var(--sp-fg)}
+
 .sp-plug-head{display:flex;align-items:center;gap:9px;min-width:0}.sp-orb{width:39px;height:39px;flex:none;display:grid;place-items:center;background:var(--sp-bg);color:var(--sp-fg);border-radius:50%}.sp-plug.on .sp-orb{background:var(--sp-on-soft);color:var(--sp-accent)}
 .sp-names{min-width:0;flex:1}.sp-names strong{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sp-names small{display:block;color:var(--sp-muted);font-size:11.5px;line-height:1.4;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sp-plug-bottom{display:flex;align-items:end;justify-content:space-between;gap:8px;margin-top:auto;padding-top:14px}.sp-data{min-width:0}.sp-state{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:5px 8px;background:var(--sp-off);color:var(--sp-muted);font-size:11px;font-weight:600;line-height:1.2}
 .sp-dot{width:6px;height:6px;border-radius:50%;background:#88998c}.sp-plug.on .sp-state{background:var(--sp-on-soft);color:var(--sp-accent)}.sp-plug.on .sp-dot{background:var(--sp-accent)}.sp-plug.unknown .sp-state{color:var(--sp-warn)}.sp-plug.unknown .sp-dot{background:var(--sp-warn)}
 .sp-reading{display:flex;align-items:baseline;gap:4px;margin-top:9px;min-height:23px}.sp-reading strong{font-weight:600;font-size:21px;letter-spacing:0;line-height:1.15;font-variant-numeric:tabular-nums}.sp-reading span{font-size:11.5px;color:var(--sp-muted);font-weight:400}.sp-energy{font-size:11.5px;color:var(--sp-muted);margin-top:4px;line-height:1.4}
-.sp-toggle{background:var(--sp-track);height:40px;width:60px;flex:none;border-radius:100px;border:1px solid var(--sp-line);padding:3px;display:flex;align-items:center;justify-content:flex-start}.sp-toggle[aria-checked=true]{background:var(--sp-accent);border-color:var(--sp-accent);justify-content:flex-end}.sp-toggle:disabled{opacity:.40}
+.sp-toggle{background:var(--sp-track);height:40px;width:60px;flex:none;border-radius:100px;border:1px solid var(--sp-line);padding:3px;display:flex;align-items:center;justify-content:flex-start}.sp-toggle[aria-checked=true]{background:var(--sp-accent);border-color:var(--sp-accent);justify-content:flex-end}.sp-toggle:disabled,.sp-toggle[aria-disabled=true]{opacity:.40}
 .sp-thumb{width:32px;height:32px;display:grid;place-items:center;background:#fff;color:#657b68;border-radius:50%;box-shadow:0 1px 4px #0002}.sp-thumb ha-icon{width:15px;height:15px;--mdc-icon-size:15px}
 .sp-list{grid-template-columns:1fr;gap:8px}.sp-list .sp-plug{min-height:85px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 12px;align-items:center}.sp-list .sp-plug-head{grid-column:1;grid-row:1}.sp-list .sp-plug-bottom{grid-column:2;grid-row:1;margin:0;padding:0;gap:10px;align-items:center}.sp-list .sp-data{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.sp-list .sp-reading{margin:0;min-height:0}.sp-list .sp-reading strong{font-size:17px}.sp-list .sp-energy{display:none}
-.sp-empty{padding:22px 12px;border:1px dashed var(--sp-line);border-radius:14px;font-size:12px;color:var(--sp-muted);text-align:center}.sp-warning{font-size:11px;color:var(--sp-danger);margin:10px 3px 0;line-height:1.45;overflow-wrap:anywhere}.sp-note{font-size:10px;color:var(--sp-muted);margin:9px 3px 0}
+.sp-note[hidden],.sp-warning[hidden]{display:none}.sp-empty{padding:22px 12px;border:1px dashed var(--sp-line);border-radius:14px;font-size:12px;color:var(--sp-muted);text-align:center}.sp-warning{font-size:11px;color:var(--sp-danger);margin:10px 3px 0;line-height:1.45;overflow-wrap:anywhere}.sp-note{font-size:10px;color:var(--sp-muted);margin:9px 3px 0}
 .sp-toggle:focus-visible{outline:2px solid var(--sp-accent);outline-offset:3px}
-@container sp-grid (max-width:340px){.sp-grid:not(.sp-list){grid-template-columns:1fr}.sp-grid:not(.sp-list) .sp-plug{min-height:126px}.sp-list .sp-plug{grid-template-columns:1fr}.sp-list .sp-plug-head{grid-column:1;grid-row:1}.sp-list .sp-plug-bottom{grid-column:1;grid-row:2;width:100%;justify-content:space-between}.sp-list .sp-data{justify-content:flex-start}}
+@container sp-grid (max-width:360px){.sp-grid:not(.sp-list){grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sp-grid:not(.sp-list) .sp-plug{min-height:180px;padding:10px 8px}.sp-grid:not(.sp-list) .sp-plug-head{gap:6px}.sp-grid:not(.sp-list) .sp-orb{width:32px;height:32px}.sp-grid:not(.sp-list) .sp-orb ha-icon{--mdc-icon-size:18px;width:18px;height:18px}.sp-grid:not(.sp-list) .sp-names strong{font-size:11.5px}.sp-grid:not(.sp-list) .sp-names small{font-size:10.5px}.sp-grid:not(.sp-list) .sp-plug-bottom{flex-direction:column;align-items:stretch;gap:8px;padding-top:10px}.sp-grid:not(.sp-list) .sp-data{max-width:100%}.sp-grid:not(.sp-list) .sp-toggle{align-self:flex-end}.sp-grid:not(.sp-list) .sp-reading strong{font-size:19px}.sp-grid:not(.sp-list) .sp-state{font-size:10px;padding:5px 6px}.sp-grid:not(.sp-list) .sp-energy{font-size:10px;overflow-wrap:anywhere}.sp-list .sp-plug{grid-template-columns:1fr}.sp-list .sp-plug-head{grid-column:1;grid-row:1}.sp-list .sp-plug-bottom{grid-column:1;grid-row:2;width:100%;justify-content:space-between}.sp-list .sp-data{justify-content:flex-start}}
+/* Prevent the optional sensor summary from changing card height when its
+   value alternates between a count and the longer "Non disponibile" label. */
+@container sp-card (max-width:360px){.sp-sensorline{min-height:33px}}
 @container sp-card (max-width:300px){.sp-root{padding:12px}.sp-summary-cell{padding:10px 7px}.sp-summary-cell strong{font-size:25px}.sp-summary-cell span{font-size:10.5px}}
 @media(max-width:420px){.sp-title{font-size:23px}.sp-summary-cell strong{font-size:25px}}
 @container sp-card (max-width:380px){.sp-title{font-size:23px}.sp-summary-cell strong{font-size:25px}}
@@ -132,14 +145,14 @@ class SmartPlugsCard extends HTMLElement {
   static getConfigElement() {return document.createElement(SP_EDITOR_TAG);}
   constructor() {
     super();this.attachShadow({mode:'open'});this._config=spConfig();this._hass=null;
-    this._busy=new Set();this._error='';this._signature='';
+    this._busy=new Set();this._error='';this._structureSignature='';
     this.shadowRoot.addEventListener('click', e=>this._onClick(e));
     this._onTheme=()=>this._render(true);
     this._media=typeof window!=='undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
   }
   connectedCallback(){this._media?.addEventListener?.('change',this._onTheme);this._render(true);}
   disconnectedCallback(){this._media?.removeEventListener?.('change',this._onTheme);}
-  setConfig(raw){this._config=spConfig(raw);this._error='';this._render(true);}
+  setConfig(raw){this._config=spConfig(raw);this._error='';this._structureSignature='';this._render(true);}
   set hass(hass){this._hass=hass;this._render();}
   getCardSize(){return Math.max(2,Math.ceil(this._config.plugs.filter(p=>p.entity).length/(this._config.layout==='list'?1:2))*2+2);}
   _entity(id){return id?this._hass?.states?.[id]:null;}
@@ -151,37 +164,69 @@ class SmartPlugsCard extends HTMLElement {
     const icon=p.icon || spIcon(entity?.attributes?.icon);
     const watt=spReading(this._entity(p.power_entity),'power');
     const energy=spReading(this._entity(p.energy_entity),'energy');
-    const watts=this._config.show_power ? `<div class="sp-reading"><strong>${watt===null?'—':spEsc(new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(watt.value))}</strong><span>W</span></div>` : '';
-    const kwh=this._config.show_energy && p.energy_entity ? `<div class="sp-energy">Energia · ${energy===null?'Non disponibile':spEsc(new Intl.NumberFormat('it-IT',{maximumFractionDigits:2}).format(energy.value))+' kWh'}</div>` : '';
+    const watts=this._config.show_power ? `<div class="sp-reading"><strong data-watt>${watt===null?'—':spEsc(new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(watt.value))}</strong><span>W</span></div>` : '';
+    const kwh=this._config.show_energy && p.energy_entity ? `<div class="sp-energy">Energia · <span data-energy>${energy===null?'Non disponibile':spEsc(new Intl.NumberFormat('it-IT',{maximumFractionDigits:2}).format(energy.value))+' kWh'}</span></div>` : '';
     const label=state===null?'Non disponibile':on?'Accesa':'Spenta';
-    const disabled=!this._config.controls_enabled || state===null || this._busy.has(p.entity) || typeof this._hass?.callService!=='function';
-    return `<article class="sp-plug ${state===null?'unknown':on?'on':'off'}"><div class="sp-plug-head"><span class="sp-orb">${spMdi(icon)}</span><span class="sp-names"><strong title="${spEsc(name)}">${spEsc(name)}</strong><small title="${spEsc(p.room)}">${spEsc(p.room||'Presa elettrica')}</small></span></div><div class="sp-plug-bottom"><div class="sp-data"><span class="sp-state"><span class="sp-dot"></span>${label}</span>${watts}${kwh}</div><button type="button" class="sp-toggle" role="switch" aria-checked="${on}" data-switch="${spEsc(p.entity)}" aria-label="${spEsc(on?'Spegni':'Accendi')} ${spEsc(name)}" ${disabled?'disabled':''} title="${this._config.controls_enabled?'Comando presa':'Abilita i comandi nella configurazione'}"><span class="sp-thumb">${spMdi('mdi:power')}</span></button></div></article>`;
+    const disabled=!this._config.controls_enabled || state===null || typeof this._hass?.callService!=='function';
+    const pending=this._busy.has(p.entity);
+    return `<article class="sp-plug ${state===null?'unknown':on?'on':'off'}" data-plug-id="${spEsc(p.entity)}"><div class="sp-plug-head"><span class="sp-orb">${spMdi(icon)}</span><span class="sp-names"><strong class="sp-name" title="${spEsc(name)}">${spEsc(name)}</strong>${p.room?`<small title="${spEsc(p.room)}">${spEsc(p.room)}</small>`:''}</span></div><div class="sp-plug-bottom"><div class="sp-data"><span class="sp-state"><span class="sp-dot"></span><span data-state-text>${label}</span></span>${watts}${kwh}</div><button type="button" class="sp-toggle" role="switch" aria-checked="${on}" aria-disabled="${disabled||pending}" data-switch="${spEsc(p.entity)}" aria-label="${spEsc(on?'Spegni':'Accendi')} ${spEsc(name)}" ${disabled?'disabled':''} title="${this._config.controls_enabled?'Comando presa':'Abilita i comandi nella configurazione'}"><span class="sp-thumb">${spMdi('mdi:power')}</span></button></div></article>`;
   }
-  _makeSignature(){
-    const c=this._config, ids=new Set([c.active_sensor]);
-    c.plugs.forEach(p=>{ids.add(p.entity);ids.add(p.power_entity);ids.add(p.energy_entity);});
-    const relevant=[...ids].filter(Boolean).map(id=>{const obj=this._entity(id);return [id,obj?.state,obj?.attributes?.unit_of_measurement,obj?.attributes?.device_class,obj?.attributes?.friendly_name,obj?.attributes?.icon];});
-    return JSON.stringify([c,relevant,this._dark(),[...this._busy],this._error]);
+  // Changes to configuration or theme require a structural render.
+  // Entity updates and switch actions update existing nodes without replacing
+  // Shadow DOM, preserving scroll position, touch focus and element geometry.
+  _structureKey(){return JSON.stringify([this._config,this._dark()]);}
+  _refreshLive(){
+    const root=this.shadowRoot.querySelector('.sp-root');if(!root)return;
+    const c=this._config, plugs=c.plugs.filter(p=>p.entity);
+    const count=spCount(plugs,this._hass?.states);
+    for(const [key,value] of Object.entries({on:count.on,off:count.off,total:count.total})){
+      const el=root.querySelector(`[data-count="${key}"]`);if(el && el.textContent!==String(value))el.textContent=String(value);
+    }
+    const external=root.querySelector('[data-external-value]');
+    if(external){const value=spExternalCount(this._entity(c.active_sensor));external.textContent=value===null?'Non disponibile':String(value);}
+    const rowMap=new Map([...root.querySelectorAll('[data-plug-id]')].map(el=>[el.dataset.plugId,el]));
+    for(const [index,p] of plugs.entries()){
+      const row=rowMap.get(p.entity);
+      if(!row)continue;
+      const state=spState(this._entity(p.entity)),on=state===true;
+      row.classList.toggle('on',on);row.classList.toggle('off',state===false);row.classList.toggle('unknown',state===null);
+      const status=row.querySelector('[data-state-text]');if(status)status.textContent=state===null?'Non disponibile':on?'Accesa':'Spenta';
+      const name=p.name||spText(this._entity(p.entity)?.attributes?.friendly_name,60)||`Presa ${index+1}`;
+      const nameEl=row.querySelector('.sp-name');if(nameEl){nameEl.textContent=name;nameEl.title=name;}
+      const wattEl=row.querySelector('[data-watt]');if(wattEl){const data=spReading(this._entity(p.power_entity),'power');wattEl.textContent=data===null?'—':new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(data.value);}
+      const energyEl=row.querySelector('[data-energy]');if(energyEl){const data=spReading(this._entity(p.energy_entity),'energy');energyEl.textContent=data===null?'Non disponibile':new Intl.NumberFormat('it-IT',{maximumFractionDigits:2}).format(data.value)+' kWh';}
+      const btn=row.querySelector('[data-switch]');if(btn){
+        const blocked=!c.controls_enabled||state===null||typeof this._hass?.callService!=='function';
+        btn.disabled=blocked;btn.setAttribute('aria-disabled',String(blocked||this._busy.has(p.entity)));
+        btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-label',`${on?'Spegni':'Accendi'} ${name}`);
+      }
+    }
+    const warning=root.querySelector('[data-error-note]');
+    if(warning){warning.hidden=!this._error;warning.textContent=this._error;}
   }
   _render(force=false){
-    if(!this.isConnected) return;
-    const signature=this._makeSignature();if(!force&&signature===this._signature)return;this._signature=signature;
-    const c=this._config, availablePlugs=c.plugs.filter(p=>p.entity), count=spCount(availablePlugs,this._hass?.states),external=c.active_sensor?spExternalCount(this._entity(c.active_sensor)):null;
+    if(!this.isConnected)return;
+    const structureKey=this._structureKey();
+    if(!force && this._structureSignature===structureKey && this.shadowRoot.querySelector('.sp-root')){
+      this._refreshLive();return;
+    }
+    const c=this._config,availablePlugs=c.plugs.filter(p=>p.entity),count=spCount(availablePlugs,this._hass?.states);
     const heading=c.show_eyebrow&&c.eyebrow?`<div class="sp-eyebrow">${spEsc(c.eyebrow)}</div>`:'';
     const title=c.show_title&&c.title?`<div class="sp-title">${spEsc(c.title)}<span>.</span></div>`:'';
-    const lastFocus=this.shadowRoot.activeElement?.getAttribute?.('data-switch');
-    this.shadowRoot.innerHTML=`<style>${SP_CSS}</style><div class="sp-root ${this._dark()?'sp-dark':''}">${heading||title?`<header class="sp-head">${heading}${title}</header>`:''}<div class="sp-summary"><div class="sp-summary-cell major"><strong>${count.on}</strong><span>Prese attive</span></div><div class="sp-summary-cell"><strong>${count.off}</strong><span>Spente</span></div><div class="sp-summary-cell"><strong>${count.total}</strong><span>Configurate</span></div></div>${c.active_sensor?`<div class="sp-sensorline">${spMdi('mdi:counter')}<span>Riepilogo sensore ${spEsc(c.active_sensor)}: ${external===null?'Non disponibile':spEsc(external)}</span></div>`:''}<div class="sp-grid-host">${availablePlugs.length?`<div class="sp-grid ${c.layout==='list'?'sp-list':''}">${availablePlugs.map((p,i)=>this._row(p,i)).join('')}</div>`:'<div class="sp-empty">Aggiungi una presa dall’editor visuale della card.</div>'}</div>${count.other?`<div class="sp-note">${count.other} ${count.other===1?'presa senza stato attendibile':'prese senza stato attendibile'}.</div>`:''}${this._error?`<div class="sp-warning" role="alert">${spEsc(this._error)}</div>`:''}</div>`;
-    if(lastFocus){const btn=[...this.shadowRoot.querySelectorAll('[data-switch]')].find(x=>x.dataset.switch===lastFocus);btn?.focus({preventScroll:true});}
+    this.shadowRoot.innerHTML=`<style>${SP_CSS}</style><div class="sp-root ${this._dark()?'sp-dark':''}">${heading||title?`<header class="sp-head">${heading}${title}</header>`:''}<div class="sp-summary"><div class="sp-summary-cell major"><strong data-count="on">${count.on}</strong><span>Prese attive</span></div><div class="sp-summary-cell"><strong data-count="off">${count.off}</strong><span>Spente</span></div><div class="sp-summary-cell"><strong data-count="total">${count.total}</strong><span>Configurate</span></div></div>${c.active_sensor?`<div class="sp-sensorline">${spMdi('mdi:counter')}<span>Prese attive — riepilogo generale</span><strong data-external-value></strong></div>`:''}<div class="sp-grid-host">${availablePlugs.length?`<div class="sp-grid ${c.layout==='list'?'sp-list':''}">${availablePlugs.map((p,i)=>this._row(p,i)).join('')}</div>`:'<div class="sp-empty">Aggiungi una presa dall’editor visuale della card.</div>'}</div><div class="sp-warning" data-error-note role="alert" hidden></div></div>`;
+    this._structureSignature=structureKey;
+    this._refreshLive();
   }
   async _onClick(event){
-    const button=event.target.closest('button[data-switch]');if(!button || button.disabled)return;
-    const id=button.dataset.switch;if(!this._config.controls_enabled || this._busy.has(id))return;
+    const button=event.target.closest('button[data-switch]');if(!button||button.disabled)return;
+    const id=button.dataset.switch;if(!this._config.controls_enabled||this._busy.has(id))return;
     if(!this._config.plugs.some(p=>p.entity===id))return;
     const state=spState(this._entity(id));if(state===null)return;
-    const action=state?'turn_off':'turn_on';this._busy.add(id);this._error='';this._render(true);
+    if(typeof this._hass?.callService!=='function')return;
+    const action=state?'turn_off':'turn_on';this._busy.add(id);this._error='';this._refreshLive();
     try{await this._hass.callService('switch',action,{entity_id:id});}
     catch(err){this._error=`Comando non riuscito per ${id}: ${err?.message||'errore di Home Assistant'}`;}
-    finally{this._busy.delete(id);this._render(true);}
+    finally{this._busy.delete(id);this._refreshLive();}
   }
 }
 const SP_EDITOR_CSS=`
