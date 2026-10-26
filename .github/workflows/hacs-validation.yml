@@ -1,4 +1,4 @@
-name: HACS validation (manual)
+name: HACS validation
 
 on:
   workflow_dispatch:
@@ -8,9 +8,8 @@ permissions: {}
 jobs:
   validate-hacs:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
-      - name: Validate Smart Plugs Card with HACS
+      - name: HACS validation
         uses: hacs/action@main
         with:
           category: plugin
