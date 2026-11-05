@@ -1,8 +1,8 @@
 # Smart Plugs Card
 
-[![TikTok | Segui](assets/tiktok-segui.svg)](https://www.tiktok.com/@luigi.regolo)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
+[![Release](https://img.shields.io/github/v/release/luigi-regolo/smart-plugs-card?label=Release&style=flat-square)](https://github.com/luigi-regolo/smart-plugs-card/releases/latest)
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue?style=flat-square)](LICENSE)
-[![HACS](https://img.shields.io/badge/HACS-Repository-41BDF5?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
 [![GitHub Stars](https://img.shields.io/github/stars/luigi-regolo/smart-plugs-card?style=flat-square)](https://github.com/luigi-regolo/smart-plugs-card/stargazers)
 
 ## Overview
@@ -13,9 +13,13 @@ It displays each configured plug's current state, provides optional on/off contr
 
 ## Preview
 
-![Smart Plugs Card — Edera Graphite Dark preview](assets/smart-plugs-card-preview.png)
+| Light | Dark |
+| --- | --- |
+| ![Smart Plugs Card in Light mode](assets/smart-plugs-card-light.png) | ![Smart Plugs Card in Dark mode](assets/smart-plugs-card-dark.png) |
 
-*Smart Plugs Card in Graphite Dark mode. Names and readings depend on the Home Assistant configuration.*
+![Smart Plugs Card in compact list layout, Dark mode](assets/smart-plugs-card-list-dark.png)
+
+*Previews use fictional demo data. Names and readings depend on your Home Assistant configuration. The interface text is currently in Italian.*
 
 ## Features
 
@@ -36,16 +40,27 @@ The available measurements and controls depend on the configured Home Assistant 
 
 ## Installation
 
-### HACS — Custom repository
+### HACS (Recommended)
 
-Install Smart Plugs Card through **Custom repositories** in HACS. Choose the **Dashboard** repository category.
+Install Smart Plugs Card directly from the default HACS catalog.
+
+[![Open Smart Plugs Card in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
 
 1. Open **HACS** in Home Assistant.
-2. Open the HACS menu and choose **Custom repositories**.
-3. Enter `https://github.com/luigi-regolo/smart-plugs-card`.
-4. Select **Dashboard** as the repository type and add it.
-5. Find **Smart Plugs Card** in HACS and download it.
-6. Reload the dashboard if necessary, then add the card using the dashboard editor.
+2. Search for **Smart Plugs Card**.
+3. Select **Smart Plugs Card** from the results.
+4. Click **Download** to install the card.
+5. Reload your dashboard if necessary.
+6. Add **Smart Plugs Card** to your dashboard and configure it using the visual editor.
+
+### Alternative: Custom repository
+
+If you prefer to add the repository manually:
+
+1. Open **HACS** and select **Custom repositories** from the menu.
+2. Enter `https://github.com/luigi-regolo/smart-plugs-card`.
+3. Select **Dashboard** as the repository type and add it.
+4. Find **Smart Plugs Card** in HACS and download it.
 
 ### Manual installation
 
@@ -127,6 +142,10 @@ Smart Plugs Card reads configured Home Assistant entities and uses Home Assistan
 - Unknown and unavailable states disable the corresponding switch control.
 - The card does not provide separate authentication or override Home Assistant permissions.
 - Do not use remote switching for appliances where unexpected activation or loss of power could create a safety risk.
+
+## Releases
+
+See [GitHub Releases](https://github.com/luigi-regolo/smart-plugs-card/releases) for published versions.
 
 ## Copyright & License
 
