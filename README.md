@@ -9,7 +9,7 @@
 
 **Smart Plugs Card** is a custom dashboard card for Home Assistant that brings multiple smart plugs into a compact, responsive interface inspired by the Edera Light and Graphite Dark styles.
 
-It displays each configured plug's current state, provides optional on/off controls, and shows power and energy readings when compatible sensors are available. The card uses existing Home Assistant entities and services; it does not communicate directly with smart plugs or require a separate cloud account.
+It displays each configured plug's current state, provides optional on/off controls, and shows power readings when a compatible sensor is available. The card uses existing Home Assistant entities and services; it does not communicate directly with smart plugs or require a separate cloud account.
 
 ## Preview
 
@@ -26,14 +26,12 @@ It displays each configured plug's current state, provides optional on/off contr
 - **Multiple plugs:** Add, rename, reorder, and remove smart plugs using the visual editor.
 - **Individual states:** Distinguish on, off, and unknown/unavailable states.
 - **On/off controls:** Switch compatible `switch.*` entities on or off when real controls have been explicitly enabled.
-- **State summary:** Count the configured plugs that are on, off, or whose state is unavailable.
-- **Optional summary sensor:** Show an independent numeric `sensor.*` value, such as the number of active plugs. This value may cover devices outside the card.
+- **State summary:** Show how many configured plugs are on, off, or unavailable.
 - **Power monitoring:** Display instantaneous power in W when a compatible `sensor.*` entity is configured (`W` and `kW` supported).
-- **Optional energy reading:** Display energy in kWh when a compatible energy sensor is configured (`Wh`, `kWh`, and `MWh` supported).
 - **Visual configuration:** Native Home Assistant entity selectors when available, with an entity-list fallback.
-- **Edera appearance:** Automatic, Light, and Graphite Dark themes; a subtle green tile highlight for active plugs in Light mode, and neutral tiles with green switches in Dark mode; configurable Home Assistant MDI icons.
+- **Edera appearance:** Automatic, Light, and Graphite Dark themes; a subtle green tile highlight for active plugs in Light mode, and neutral tiles with green switches in Dark mode; compact iOS-style switches; configurable Home Assistant MDI icons.
 - **Optional headings:** Show or hide the upper label and main title independently.
-- **Responsive design:** Two-column grid on supported narrow dashboard layouts, including smartphones, with a separate compact list option.
+- **Responsive design:** Compact grid that adapts from two to four columns to the available card width, from smartphones to desktops, with a separate compact list option.
 - **No detail popups:** Switching and status information stay in the card itself.
 
 The available measurements and controls depend on the configured Home Assistant devices and integrations. Unknown or unavailable states are not interpreted as off.
@@ -78,11 +76,11 @@ If the `www` directory has just been created, Home Assistant may need a restart 
 
 After adding the card, use the editor sections:
 
-- **Plugs:** Add smart plugs, select their controllable `switch.*` entities, set display names and rooms, choose MDI icons, and optionally assign power/energy sensors. Configure an optional independent summary sensor.
-- **Appearance:** Show or hide either heading, change their text, choose Automatic/Light/Dark appearance, switch between grid and compact list, and show or hide W and kWh readings.
+- **Plugs:** Add smart plugs, select their controllable `switch.*` entities, set display names and rooms, choose MDI icons, and optionally assign a power sensor.
+- **Appearance:** Show or hide either heading, change their text, choose Automatic/Light/Dark appearance, switch between grid and compact list, and show or hide the W reading.
 - **Advanced:** Enable the real on/off controls. Controls are **disabled by default**.
 
-The entity pickers restrict plug controls to `switch.*` entities and measurement sensors to `sensor.*` entities with the relevant power or energy device class. The optional summary sensor is selected separately from the individual plug states.
+The entity pickers restrict plug controls to `switch.*` entities and power sensors to `sensor.*` entities with the power device class.
 
 ### Example YAML configuration
 
@@ -97,7 +95,6 @@ show_eyebrow: true
 theme_mode: auto
 layout: grid
 show_power: true
-show_energy: false
 controls_enabled: false
 plugs:
   - name: Washing machine
@@ -107,7 +104,7 @@ plugs:
     power_entity: sensor.example_washing_machine_power
 ```
 
-Replace the example entities with entities actually present in Home Assistant. An energy sensor or external active-plug count is optional.
+Replace the example entities with entities actually present in Home Assistant. The power sensor is optional.
 
 ### Main configuration options
 
@@ -117,31 +114,22 @@ Replace the example entities with entities actually present in Home Assistant. A
 | `show_title` / `show_eyebrow` | Show or hide the two headings independently. |
 | `theme_mode` | `auto`, `light`, or `dark`. |
 | `layout` | `grid` or `list`. |
-| `show_power` / `show_energy` | Show optional power and energy values. |
-| `active_sensor` | Optional numeric `sensor.*` count shown separately. |
+| `show_power` | Show the optional power value. |
 | `controls_enabled` | Enable real on/off commands; defaults to `false`. |
 | `plugs` | List of individually configured smart plugs. |
 
-Each entry in `plugs` supports `name`, `room`, `icon`, `entity`, `power_entity`, and `energy_entity`.
+Each entry in `plugs` supports `name`, `room`, `icon`, `entity`, and `power_entity`.
+
+The `active_sensor`, `show_energy`, and `energy_entity` options from earlier versions have been removed. Existing configurations that still contain them keep working; the options are ignored.
 
 ## Compatibility and Requirements
 
 - Home Assistant with support for custom JavaScript dashboard modules.
 - A `switch.*` entity for each plug to be controlled or monitored.
-- Optional compatible `sensor.*` entities for power, energy, or an independent count.
+- Optional compatible `sensor.*` entities for power.
 - HACS is needed only for installation through HACS.
 
 No specific minimum Home Assistant version has been independently verified. The card has no additional external JavaScript libraries, dedicated paid API, or subscription requirement. Individual plug integrations may use their manufacturers' cloud services.
-
-## Privacy and Security
-
-Smart Plugs Card reads configured Home Assistant entities and uses Home Assistant's existing service calls and user permissions. It does not implement telemetry, advertising, analytics, external JavaScript loading, or direct third-party requests.
-
-- Real commands are disabled by default and require explicit activation in the card editor.
-- Only valid configured `switch.*` entities are targeted for `switch.turn_on` and `switch.turn_off`.
-- Unknown and unavailable states disable the corresponding switch control.
-- The card does not provide separate authentication or override Home Assistant permissions.
-- Do not use remote switching for appliances where unexpected activation or loss of power could create a safety risk.
 
 ## Releases
 

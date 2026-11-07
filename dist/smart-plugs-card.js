@@ -10,11 +10,11 @@ const SP_DEFAULTS = Object.freeze({
   title: 'Prese elettriche', eyebrow: 'SMART PLUGS CARD',
   show_title: true, show_eyebrow: true,
   theme_mode: 'auto', layout: 'grid',
-  show_power: true, show_energy: false,
-  active_sensor: '', controls_enabled: false, plugs: [],
+  show_power: true,
+  controls_enabled: false, plugs: [],
 });
-const SP_DOMAINS = Object.freeze({entity: 'switch', power_entity: 'sensor', energy_entity: 'sensor'});
-const SP_CLASSES = Object.freeze({power_entity: 'power', energy_entity: 'energy'});
+const SP_DOMAINS = Object.freeze({entity: 'switch', power_entity: 'sensor'});
+const SP_CLASSES = Object.freeze({power_entity: 'power'});
 const SP_ICONS = Object.freeze([
   ['mdi:power-socket-eu', 'Presa elettrica'],
   ['mdi:washing-machine', 'Lavatrice'],
@@ -41,11 +41,11 @@ function spPlug(raw={}) {
     icon: spIcon(r.icon),
     entity: spEntity(r.entity,'switch'),
     power_entity: spEntity(r.power_entity,'sensor'),
-    energy_entity: spEntity(r.energy_entity,'sensor'),
   };
 }
 function spConfig(raw={}) {
   const r=raw && typeof raw==='object' && !Array.isArray(raw) ? raw : {};
+  const {active_sensor:_removed,...legacyless}=r; // legacy option dropped: ignored and cleaned on the next save
   const unique=new Set(); const plugs=[];
   for(const value of Array.isArray(r.plugs)?r.plugs:[]) {
     const p=spPlug(value);
@@ -53,14 +53,13 @@ function spConfig(raw={}) {
     plugs.push(p); if(p.entity) unique.add(p.entity);
   }
   return {
-    ...r, type: SP_TYPE,
+    ...legacyless, type: SP_TYPE,
     title:spText(r.title??SP_DEFAULTS.title,60),
     eyebrow:spText(r.eyebrow??SP_DEFAULTS.eyebrow,60),
     show_title:r.show_title!==false, show_eyebrow:r.show_eyebrow!==false,
     theme_mode:['auto','light','dark'].includes(r.theme_mode)?r.theme_mode:'auto',
     layout:['grid','list'].includes(r.layout)?r.layout:'grid',
-    show_power:r.show_power!==false, show_energy:r.show_energy===true,
-    active_sensor:spEntity(r.active_sensor,'sensor'),
+    show_power:r.show_power!==false,
     controls_enabled:r.controls_enabled===true,
     plugs,
   };
@@ -87,11 +86,6 @@ function spCount(plugs, states) {
   for(const plug of plugs.filter(p=>p.entity)){const state=spState(states?.[plug.entity]); if(state===true)on++; else if(state===false)off++; else other++;}
   return {on,off,other,total:plugs.filter(p=>p.entity).length};
 }
-function spExternalCount(entity) {
-  if(!entity || ['unknown','unavailable',''].includes(entity.state))return null;
-  const n=Number(entity.state);
-  return Number.isSafeInteger(n)&&n>=0?n:null;
-}
 function spMdi(name) {return `<ha-icon icon="${spEsc(name)}" aria-hidden="true"></ha-icon>`;}
 const SP_CSS=`
 :host{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;font-family:var(--ha-font-family-body,Roboto,Arial,sans-serif);font-size:var(--ha-font-size-m,14px)}
@@ -101,15 +95,16 @@ ha-icon{display:inline-flex;align-items:center;justify-content:center;vertical-a
 .sp-root.sp-dark{--sp-bg:#101211;--sp-tile:#191c1a;--sp-surface:#191c1a;--sp-line:#2b302c;--sp-fg:#f5f7f4;--sp-muted:#bbc5bd;--sp-accent:#0e795d;--sp-on-bg:#172a20;--sp-on-line:#285641;--sp-on-soft:#1d4a35;--sp-track:#434d45;--sp-off:#282b29;--sp-warn:#e6b66c;--sp-danger:#ff8888}
 .sp-dark .sp-orb{background:#282b29}.sp-dark .sp-plug.off{background:#191c1a}
 .sp-head{margin:2px 4px 17px}.sp-eyebrow{font-size:10px;letter-spacing:1.7px;font-weight:750;color:var(--sp-muted);margin-bottom:7px}.sp-title{font-size:25px;line-height:1.14;font-weight:780;letter-spacing:-.7px;overflow-wrap:anywhere}.sp-title span{color:var(--sp-accent);font-weight:800}
+/* Summary tiles: unchanged look. The third tile ("Non disp.") is always present, so the row never changes size. */
 .sp-summary{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:8px;margin-bottom:11px}
 .sp-summary-cell{min-width:0;background:var(--sp-surface);border:1px solid var(--sp-line);border-radius:15px;padding:13px 9px}
-.sp-summary-cell.major{background:var(--sp-on-bg);border-color:var(--sp-on-line)}
-.sp-summary-cell strong{display:block;font-size:29px;letter-spacing:-.7px;font-weight:650;line-height:1.15;font-variant-numeric:tabular-nums}.sp-summary-cell.major strong{color:var(--sp-accent)}
+.sp-summary-cell.major{background:var(--sp-on-bg);border-color:var(--sp-on-line)}.sp-summary-cell.warn{border-style:dashed}
+.sp-summary-cell strong{display:block;font-size:29px;letter-spacing:-.7px;font-weight:650;line-height:1.15;font-variant-numeric:tabular-nums}.sp-summary-cell.major strong{color:var(--sp-accent)}.sp-summary-cell.warn strong{color:var(--sp-warn)}
 .sp-summary-cell span{display:block;font-size:11.5px;line-height:1.4;color:var(--sp-muted);font-weight:400;margin-top:5px;overflow-wrap:break-word}
-.sp-sensorline{color:var(--sp-muted);margin:0 2px 14px;font-size:11.5px;line-height:1.4;display:flex;align-items:center;gap:5px;min-width:0}.sp-sensorline ha-icon{width:14px;height:14px;--mdc-icon-size:14px}.sp-sensorline span{min-width:0;overflow-wrap:anywhere}.sp-sensorline strong{flex:none;margin-left:auto;color:var(--sp-fg);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .sp-grid-host{container:sp-grid/inline-size;min-width:0}
-.sp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.sp-plug{min-width:0;border:1px solid var(--sp-line);background:var(--sp-tile);border-radius:17px;min-height:153px;padding:13px 12px;display:flex;flex-direction:column}
+.sp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+/* Plug tile: icon + switch on the first row, full-width name below, state + reading pinned to the bottom. */
+.sp-plug{min-width:0;border:1px solid var(--sp-line);background:var(--sp-tile);border-radius:17px;min-height:112px;padding:11px 11px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto 1fr;grid-template-areas:"orb toggle" "names names" "meta meta";gap:8px 6px;align-items:start}
 .sp-plug.on{background:var(--sp-on-bg);border-color:var(--sp-on-line)}.sp-plug.unknown{border-style:dashed}
 /* Edera Graphite Dark: active tiles remain neutral; only their switches turn green.
    Edera Light intentionally retains its approved green active-tile wash. */
@@ -120,20 +115,28 @@ ha-icon{display:inline-flex;align-items:center;justify-content:center;vertical-a
 .sp-root.sp-dark .sp-summary-cell.major{background:var(--sp-surface);border-color:var(--sp-line)}
 .sp-root.sp-dark .sp-summary-cell.major strong{color:var(--sp-fg)}
 
-.sp-plug-head{display:flex;align-items:center;gap:9px;min-width:0}.sp-orb{width:39px;height:39px;flex:none;display:grid;place-items:center;background:var(--sp-bg);color:var(--sp-fg);border-radius:50%}.sp-plug.on .sp-orb{background:var(--sp-on-soft);color:var(--sp-accent)}
-.sp-names{min-width:0;flex:1}.sp-names strong{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sp-names small{display:block;color:var(--sp-muted);font-size:11.5px;line-height:1.4;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sp-plug-bottom{display:flex;align-items:end;justify-content:space-between;gap:8px;margin-top:auto;padding-top:14px}.sp-data{min-width:0}.sp-state{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:5px 8px;background:var(--sp-off);color:var(--sp-muted);font-size:11px;font-weight:600;line-height:1.2}
+.sp-orb{grid-area:orb;justify-self:start;width:36px;height:36px;display:grid;place-items:center;background:var(--sp-bg);color:var(--sp-fg);border-radius:50%}.sp-plug.on .sp-orb{background:var(--sp-on-soft);color:var(--sp-accent)}
+.sp-names{grid-area:names;min-width:0}.sp-names strong{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sp-names small{display:block;color:var(--sp-muted);font-size:11.5px;line-height:1.4;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-meta{grid-area:meta;align-self:end;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 8px;min-width:0}
+.sp-state{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:4px 8px;background:var(--sp-off);color:var(--sp-muted);font-size:10.5px;font-weight:600;line-height:1.2}
 .sp-dot{width:6px;height:6px;border-radius:50%;background:#88998c}.sp-plug.on .sp-state{background:var(--sp-on-soft);color:var(--sp-accent)}.sp-plug.on .sp-dot{background:var(--sp-accent)}.sp-plug.unknown .sp-state{color:var(--sp-warn)}.sp-plug.unknown .sp-dot{background:var(--sp-warn)}
-.sp-reading{display:flex;align-items:baseline;gap:4px;margin-top:9px;min-height:23px}.sp-reading strong{font-weight:600;font-size:21px;letter-spacing:0;line-height:1.15;font-variant-numeric:tabular-nums}.sp-reading span{font-size:11.5px;color:var(--sp-muted);font-weight:400}.sp-energy{font-size:11.5px;color:var(--sp-muted);margin-top:4px;line-height:1.4}
-.sp-toggle{background:var(--sp-track);height:40px;width:60px;flex:none;border-radius:100px;border:1px solid var(--sp-line);padding:3px;display:flex;align-items:center;justify-content:flex-start}.sp-toggle[aria-checked=true]{background:var(--sp-accent);border-color:var(--sp-accent);justify-content:flex-end}.sp-toggle:disabled,.sp-toggle[aria-disabled=true]{opacity:.40}
-.sp-thumb{width:32px;height:32px;display:grid;place-items:center;background:#fff;color:#657b68;border-radius:50%;box-shadow:0 1px 4px #0002}.sp-thumb ha-icon{width:15px;height:15px;--mdc-icon-size:15px}
-.sp-list{grid-template-columns:1fr;gap:8px}.sp-list .sp-plug{min-height:85px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 12px;align-items:center}.sp-list .sp-plug-head{grid-column:1;grid-row:1}.sp-list .sp-plug-bottom{grid-column:2;grid-row:1;margin:0;padding:0;gap:10px;align-items:center}.sp-list .sp-data{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.sp-list .sp-reading{margin:0;min-height:0}.sp-list .sp-reading strong{font-size:17px}.sp-list .sp-energy{display:none}
+.sp-reading{display:flex;align-items:baseline;gap:3px;min-height:0}.sp-reading strong{font-weight:600;font-size:18px;line-height:1.1;font-variant-numeric:tabular-nums}.sp-reading span{font-size:11px;color:var(--sp-muted);font-weight:400}
+/* Standard switch (compact): 44x26 visible, no icon; touch area extended to 44px with a pseudo-element. */
+.sp-toggle{grid-area:toggle;position:relative;background:var(--sp-track);height:26px;width:44px;flex:none;border-radius:100px;border:1px solid var(--sp-line);padding:2px;display:flex;align-items:center;justify-content:flex-start}
+.sp-toggle:before{content:"";position:absolute;inset:-9px -4px}
+.sp-toggle[aria-checked=true]{background:var(--sp-accent);border-color:var(--sp-accent)}.sp-toggle:disabled,.sp-toggle[aria-disabled=true]{opacity:.40}
+.sp-thumb{width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 3px #0003;transition:transform .18s ease}.sp-toggle[aria-checked=true] .sp-thumb{transform:translateX(18px)}
+.sp-list{grid-template-columns:1fr;gap:8px}.sp-list .sp-plug{min-height:62px;grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-rows:auto;grid-template-areas:"orb names meta toggle";gap:10px;align-items:center;padding:10px 12px}.sp-list .sp-meta{align-self:center;justify-content:flex-end;flex-wrap:nowrap;gap:10px}.sp-list .sp-reading strong{font-size:16px}
 .sp-note[hidden],.sp-warning[hidden]{display:none}.sp-empty{padding:22px 12px;border:1px dashed var(--sp-line);border-radius:14px;font-size:12px;color:var(--sp-muted);text-align:center}.sp-warning{font-size:11px;color:var(--sp-danger);margin:10px 3px 0;line-height:1.45;overflow-wrap:anywhere}.sp-note{font-size:10px;color:var(--sp-muted);margin:9px 3px 0}
 .sp-toggle:focus-visible{outline:2px solid var(--sp-accent);outline-offset:3px}
-@container sp-grid (max-width:360px){.sp-grid:not(.sp-list){grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sp-grid:not(.sp-list) .sp-plug{min-height:180px;padding:10px 8px}.sp-grid:not(.sp-list) .sp-plug-head{gap:6px}.sp-grid:not(.sp-list) .sp-orb{width:32px;height:32px}.sp-grid:not(.sp-list) .sp-orb ha-icon{--mdc-icon-size:18px;width:18px;height:18px}.sp-grid:not(.sp-list) .sp-names strong{font-size:11.5px}.sp-grid:not(.sp-list) .sp-names small{font-size:10.5px}.sp-grid:not(.sp-list) .sp-plug-bottom{flex-direction:column;align-items:stretch;gap:8px;padding-top:10px}.sp-grid:not(.sp-list) .sp-data{max-width:100%}.sp-grid:not(.sp-list) .sp-toggle{align-self:flex-end}.sp-grid:not(.sp-list) .sp-reading strong{font-size:19px}.sp-grid:not(.sp-list) .sp-state{font-size:10px;padding:5px 6px}.sp-grid:not(.sp-list) .sp-energy{font-size:10px;overflow-wrap:anywhere}.sp-list .sp-plug{grid-template-columns:1fr}.sp-list .sp-plug-head{grid-column:1;grid-row:1}.sp-list .sp-plug-bottom{grid-column:1;grid-row:2;width:100%;justify-content:space-between}.sp-list .sp-data{justify-content:flex-start}}
-/* Prevent the optional sensor summary from changing card height when its
-   value alternates between a count and the longer "Non disponibile" label. */
-@container sp-card (max-width:360px){.sp-sensorline{min-height:33px}}
+/* Tablet / desktop: more columns when the card is wide (the width of the card matters, not the screen). */
+@container sp-grid (min-width:560px){.sp-grid:not(.sp-list){grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.sp-plug{min-height:118px;padding:12px 13px 13px}}
+@container sp-grid (min-width:820px){.sp-grid:not(.sp-list){grid-template-columns:repeat(4,minmax(0,1fr))}.sp-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container sp-card (min-width:560px){.sp-summary{max-width:620px}}
+/* Smartphones */
+@container sp-grid (max-width:360px){.sp-plug{padding:10px 10px 11px;gap:7px 5px;min-height:104px}.sp-orb{width:32px;height:32px}.sp-orb ha-icon{--mdc-icon-size:18px;width:18px;height:18px}.sp-names strong{font-size:12px}.sp-names small{font-size:10.5px}.sp-state{font-size:10px;padding:4px 7px}.sp-reading strong{font-size:17px}.sp-list .sp-plug{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"orb names toggle" "meta meta meta";gap:8px 10px}.sp-list .sp-meta{justify-content:flex-start}}
+/* Very narrow phones (320-360 px cards): state and reading always stack, so every tile keeps the same height. */
+@container sp-grid (max-width:330px){.sp-meta{flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:5px}.sp-list .sp-meta{flex-direction:row;align-items:center;justify-content:flex-start;gap:10px}}
 @container sp-card (max-width:300px){.sp-root{padding:12px}.sp-summary-cell{padding:10px 7px}.sp-summary-cell strong{font-size:25px}.sp-summary-cell span{font-size:10.5px}}
 @media(max-width:420px){.sp-title{font-size:23px}.sp-summary-cell strong{font-size:25px}}
 @container sp-card (max-width:380px){.sp-title{font-size:23px}.sp-summary-cell strong{font-size:25px}}
@@ -163,13 +166,11 @@ class SmartPlugsCard extends HTMLElement {
     const name=p.name||spText(entity?.attributes?.friendly_name,60)||`Presa ${index+1}`;
     const icon=p.icon || spIcon(entity?.attributes?.icon);
     const watt=spReading(this._entity(p.power_entity),'power');
-    const energy=spReading(this._entity(p.energy_entity),'energy');
     const watts=this._config.show_power ? `<div class="sp-reading"><strong data-watt>${watt===null?'—':spEsc(new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(watt.value))}</strong><span>W</span></div>` : '';
-    const kwh=this._config.show_energy && p.energy_entity ? `<div class="sp-energy">Energia · <span data-energy>${energy===null?'Non disponibile':spEsc(new Intl.NumberFormat('it-IT',{maximumFractionDigits:2}).format(energy.value))+' kWh'}</span></div>` : '';
     const label=state===null?'Non disponibile':on?'Accesa':'Spenta';
     const disabled=!this._config.controls_enabled || state===null || typeof this._hass?.callService!=='function';
     const pending=this._busy.has(p.entity);
-    return `<article class="sp-plug ${state===null?'unknown':on?'on':'off'}" data-plug-id="${spEsc(p.entity)}"><div class="sp-plug-head"><span class="sp-orb">${spMdi(icon)}</span><span class="sp-names"><strong class="sp-name" title="${spEsc(name)}">${spEsc(name)}</strong>${p.room?`<small title="${spEsc(p.room)}">${spEsc(p.room)}</small>`:''}</span></div><div class="sp-plug-bottom"><div class="sp-data"><span class="sp-state"><span class="sp-dot"></span><span data-state-text>${label}</span></span>${watts}${kwh}</div><button type="button" class="sp-toggle" role="switch" aria-checked="${on}" aria-disabled="${disabled||pending}" data-switch="${spEsc(p.entity)}" aria-label="${spEsc(on?'Spegni':'Accendi')} ${spEsc(name)}" ${disabled?'disabled':''} title="${this._config.controls_enabled?'Comando presa':'Abilita i comandi nella configurazione'}"><span class="sp-thumb">${spMdi('mdi:power')}</span></button></div></article>`;
+    return `<article class="sp-plug ${state===null?'unknown':on?'on':'off'}" data-plug-id="${spEsc(p.entity)}"><span class="sp-orb">${spMdi(icon)}</span><span class="sp-names"><strong class="sp-name" title="${spEsc(name)}">${spEsc(name)}</strong>${p.room?`<small title="${spEsc(p.room)}">${spEsc(p.room)}</small>`:''}</span><button type="button" class="sp-toggle" role="switch" aria-checked="${on}" aria-disabled="${disabled||pending}" data-switch="${spEsc(p.entity)}" aria-label="${spEsc(on?'Spegni':'Accendi')} ${spEsc(name)}" ${disabled?'disabled':''} title="${this._config.controls_enabled?'Comando presa':'Abilita i comandi nella configurazione'}"><span class="sp-thumb"></span></button><div class="sp-meta"><span class="sp-state"><span class="sp-dot"></span><span data-state-text>${label}</span></span>${watts}</div></article>`;
   }
   // Changes to configuration or theme require a structural render.
   // Entity updates and switch actions update existing nodes without replacing
@@ -179,11 +180,10 @@ class SmartPlugsCard extends HTMLElement {
     const root=this.shadowRoot.querySelector('.sp-root');if(!root)return;
     const c=this._config, plugs=c.plugs.filter(p=>p.entity);
     const count=spCount(plugs,this._hass?.states);
-    for(const [key,value] of Object.entries({on:count.on,off:count.off,total:count.total})){
+    for(const [key,value] of Object.entries({on:count.on,off:count.off,other:count.other})){
       const el=root.querySelector(`[data-count="${key}"]`);if(el && el.textContent!==String(value))el.textContent=String(value);
     }
-    const external=root.querySelector('[data-external-value]');
-    if(external){const value=spExternalCount(this._entity(c.active_sensor));external.textContent=value===null?'Non disponibile':String(value);}
+    const otherCell=root.querySelector('[data-cell="other"]');if(otherCell)otherCell.classList.toggle('warn',count.other>0);
     const rowMap=new Map([...root.querySelectorAll('[data-plug-id]')].map(el=>[el.dataset.plugId,el]));
     for(const [index,p] of plugs.entries()){
       const row=rowMap.get(p.entity);
@@ -194,7 +194,6 @@ class SmartPlugsCard extends HTMLElement {
       const name=p.name||spText(this._entity(p.entity)?.attributes?.friendly_name,60)||`Presa ${index+1}`;
       const nameEl=row.querySelector('.sp-name');if(nameEl){nameEl.textContent=name;nameEl.title=name;}
       const wattEl=row.querySelector('[data-watt]');if(wattEl){const data=spReading(this._entity(p.power_entity),'power');wattEl.textContent=data===null?'—':new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(data.value);}
-      const energyEl=row.querySelector('[data-energy]');if(energyEl){const data=spReading(this._entity(p.energy_entity),'energy');energyEl.textContent=data===null?'Non disponibile':new Intl.NumberFormat('it-IT',{maximumFractionDigits:2}).format(data.value)+' kWh';}
       const btn=row.querySelector('[data-switch]');if(btn){
         const blocked=!c.controls_enabled||state===null||typeof this._hass?.callService!=='function';
         btn.disabled=blocked;btn.setAttribute('aria-disabled',String(blocked||this._busy.has(p.entity)));
@@ -213,7 +212,7 @@ class SmartPlugsCard extends HTMLElement {
     const c=this._config,availablePlugs=c.plugs.filter(p=>p.entity),count=spCount(availablePlugs,this._hass?.states);
     const heading=c.show_eyebrow&&c.eyebrow?`<div class="sp-eyebrow">${spEsc(c.eyebrow)}</div>`:'';
     const title=c.show_title&&c.title?`<div class="sp-title">${spEsc(c.title)}<span>.</span></div>`:'';
-    this.shadowRoot.innerHTML=`<style>${SP_CSS}</style><div class="sp-root ${this._dark()?'sp-dark':''}">${heading||title?`<header class="sp-head">${heading}${title}</header>`:''}<div class="sp-summary"><div class="sp-summary-cell major"><strong data-count="on">${count.on}</strong><span>Prese attive</span></div><div class="sp-summary-cell"><strong data-count="off">${count.off}</strong><span>Spente</span></div><div class="sp-summary-cell"><strong data-count="total">${count.total}</strong><span>Configurate</span></div></div>${c.active_sensor?`<div class="sp-sensorline">${spMdi('mdi:counter')}<span>Prese attive — riepilogo generale</span><strong data-external-value></strong></div>`:''}<div class="sp-grid-host">${availablePlugs.length?`<div class="sp-grid ${c.layout==='list'?'sp-list':''}">${availablePlugs.map((p,i)=>this._row(p,i)).join('')}</div>`:'<div class="sp-empty">Aggiungi una presa dall’editor visuale della card.</div>'}</div><div class="sp-warning" data-error-note role="alert" hidden></div></div>`;
+    this.shadowRoot.innerHTML=`<style>${SP_CSS}</style><div class="sp-root ${this._dark()?'sp-dark':''}">${heading||title?`<header class="sp-head">${heading}${title}</header>`:''}<div class="sp-summary"><div class="sp-summary-cell major"><strong data-count="on">${count.on}</strong><span>Prese attive</span></div><div class="sp-summary-cell"><strong data-count="off">${count.off}</strong><span>Spente</span></div><div class="sp-summary-cell${count.other?' warn':''}" data-cell="other"><strong data-count="other">${count.other}</strong><span>Non disp.</span></div></div><div class="sp-grid-host">${availablePlugs.length?`<div class="sp-grid ${c.layout==='list'?'sp-list':''}">${availablePlugs.map((p,i)=>this._row(p,i)).join('')}</div>`:'<div class="sp-empty">Aggiungi una presa dall’editor visuale della card.</div>'}</div><div class="sp-warning" data-error-note role="alert" hidden></div></div>`;
     this._structureSignature=structureKey;
     this._refreshLive();
   }
@@ -235,7 +234,7 @@ const SP_EDITOR_CSS=`
 .sp-heading{font-size:15px;font-weight:750;margin:0 0 8px}.sp-desc,.sp-help{font-size:12px;color:var(--secondary-text-color,#68776d);line-height:1.5}.sp-field{margin:13px 0;min-width:0}.sp-label{font-size:12px;font-weight:690;margin:0 0 7px;display:block}.sp-input{display:block;min-height:42px;width:100%;border:1px solid var(--divider-color,#cad6ca);background:var(--card-background-color,var(--secondary-background-color,#f7faf7));color:var(--primary-text-color,#19231c);border-radius:11px;padding:10px 12px}
 .sp-controlrow{display:flex;align-items:center;gap:8px;min-width:0}.sp-grow{flex:1;min-width:0}.sp-controls{display:flex;gap:5px;flex:none}.sp-btn{border:1px solid var(--divider-color,#cad6ca);background:var(--secondary-background-color,#eff3ef);color:var(--primary-text-color,#1a231d);padding:9px 12px;border-radius:12px;cursor:pointer}.sp-btn:disabled{opacity:.4}.sp-btn.primary{background:var(--primary-color,#0b7659);color:#fff;border-color:transparent}.sp-btn.iconbtn{padding:8px;display:grid;place-items:center;min-width:37px;height:37px}.sp-btn ha-icon{--mdc-icon-size:17px;width:17px;height:17px}
 .sp-entry{border:1px solid var(--divider-color,#dee6de);padding:11px 10px;border-radius:14px;margin:9px 0}.sp-entry-head{display:flex;align-items:center;gap:10px}.sp-entry-head span{flex:1;min-width:0;font-weight:680;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px}.sp-entry-head small{color:var(--secondary-text-color,#697b70);font-weight:400;font-size:10px;display:block;margin-top:3px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
-.sp-selectors{padding:9px 3px 0}.sp-selectors ha-selector{display:block;width:100%;--mdc-theme-primary:var(--primary-color,#0b7355)}.sp-tip{padding:11px;border-radius:13px;background:var(--secondary-background-color,#edf2ed);font-size:12px;line-height:1.45;color:var(--secondary-text-color,#667469);margin:14px 0}.sp-cbrow{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--divider-color,#e0e8df);padding:12px 2px}.sp-cbrow strong{display:block;font-size:13px;font-weight:670}.sp-cbrow small{display:block;font-size:11px;color:var(--secondary-text-color,#647265);margin-top:4px}.sp-cbrow input{height:20px;width:20px;accent-color:var(--primary-color,#096e53);flex:none}.sp-error{color:var(--error-color,#bf3c3c);font-size:12px;margin-top:9px}
+.sp-selectors{padding:9px 3px 0}.sp-selectors ha-selector{display:block;width:100%;--mdc-theme-primary:var(--primary-color,#0b7355)}.sp-tip{padding:11px;border-radius:13px;background:var(--secondary-background-color,#edf2ed);font-size:12px;line-height:1.45;color:var(--secondary-text-color,#667469);margin:14px 0}.sp-cbrow{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--divider-color,#e0e8df);padding:12px 2px}.sp-cbrow strong{display:block;font-size:13px;font-weight:670}.sp-cbrow small{display:block;font-size:11px;color:var(--secondary-text-color,#647265);margin-top:4px}.sp-cbrow input[type=checkbox]{appearance:none;-webkit-appearance:none;position:relative;flex:none;width:44px;height:26px;margin:0;border-radius:100px;border:1px solid var(--divider-color,#cfd8cf);background:var(--secondary-background-color,#d7e0d8);cursor:pointer;transition:background .18s}.sp-cbrow input[type=checkbox]:before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:transform .18s}.sp-cbrow input[type=checkbox]:checked{background:var(--primary-color,#096e53);border-color:var(--primary-color,#096e53)}.sp-cbrow input[type=checkbox]:checked:before{transform:translateX(18px)}.sp-input:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.sp-cbrow input[type=checkbox],.sp-cbrow input[type=checkbox]:before{transition:none}}.sp-error{color:var(--error-color,#bf3c3c);font-size:12px;margin-top:9px}
 .sp-editor button:focus-visible,.sp-editor input:focus-visible,.sp-editor select:focus-visible{outline:2px solid var(--primary-color,#0b7355);outline-offset:2px}
 `;
 class SmartPlugsCardEditor extends HTMLElement {
@@ -259,7 +258,7 @@ class SmartPlugsCardEditor extends HTMLElement {
   _update(patch){this._config=spConfig({...this._config,...patch});this._error='';this._emit();this._render();}
   _updatePlug(index,patch){if(index<0||index>=this._config.plugs.length)return;const plugs=this._config.plugs.map((p,i)=>i===index?{...p,...patch}:p);this._update({plugs});}
   _field(label,content,help=''){return `<div class="sp-field"><label class="sp-label">${spEsc(label)}</label>${content}${help?`<p class="sp-help">${spEsc(help)}</p>`:''}</div>`;}
-  _input(key,label,value,index='global'){return this._field(label,`<input class="sp-input" data-index="${index}" data-key="${key}" type="text" maxlength="80" value="${spEsc(value)}"/>`);}
+  _input(key,label,value,index='global',disabled=false){return this._field(label,`<input class="sp-input" data-index="${index}" data-key="${key}" type="text" maxlength="80" value="${spEsc(value)}" ${disabled?'disabled':''}/>`);}
   _select(key,label,value,options){return this._field(label,`<select class="sp-input" data-index="global" data-key="${key}">${options.map(([v,t])=>`<option value="${spEsc(v)}" ${v===value?'selected':''}>${spEsc(t)}</option>`).join('')}</select>`);}
   _check(key,label,help){return `<label class="sp-cbrow"><span><strong>${spEsc(label)}</strong><small>${spEsc(help)}</small></span><input type="checkbox" data-index="global" data-key="${key}" ${this._config[key]?'checked':''}/></label>`;}
   _selector(index,key,label,help=''){
@@ -272,22 +271,20 @@ class SmartPlugsCardEditor extends HTMLElement {
     if(c.plugs.length){
       content+=`<div class="sp-field"><label class="sp-label" for="sp-chosen">Presa da configurare</label><select id="sp-chosen" class="sp-input" data-special="selected">${c.plugs.map((p,i)=>`<option value="${i}" ${i===this._selected?'selected':''}>${spEsc(p.name||p.entity||`Presa ${i+1}`)}</option>`).join('')}</select></div>`;
       const p=c.plugs[this._selected];
-      if(p){content+=`<section class="sp-entry">${this._input('name','Nome visualizzato',p.name,this._selected)}${this._input('room','Ambiente',p.room,this._selected)}${this._selector(this._selected,'entity','Presa da comandare (switch.*)','Ricerca limitata alle entità switch.*. Ad esempio switch.macchina_presa_esempio.')}${this._selector(this._selected,'power_entity','Potenza istantanea (sensor.*)','Solo sensori classificati power; W o kW.')}${this._selector(this._selected,'energy_entity','Energia consumata (sensor.*)','Solo sensori classificati energy; Wh, kWh o MWh.')}${this._selector(this._selected,'icon','Icona Home Assistant (MDI)')}<div class="sp-controls"><button type="button" class="sp-btn iconbtn" data-move="-1" ${this._selected===0?'disabled':''} title="Sposta su">${spMdi('mdi:arrow-up')}</button><button type="button" class="sp-btn iconbtn" data-move="1" ${this._selected===c.plugs.length-1?'disabled':''} title="Sposta giù">${spMdi('mdi:arrow-down')}</button><button type="button" class="sp-btn" data-delete="1">Rimuovi presa</button></div></section>`;}
+      if(p){content+=`<section class="sp-entry">${this._input('name','Nome visualizzato',p.name,this._selected)}${this._input('room','Ambiente',p.room,this._selected)}${this._selector(this._selected,'entity','Presa da comandare (switch.*)','Ricerca limitata alle entità switch.*. Ad esempio switch.macchina_presa_esempio.')}${this._selector(this._selected,'power_entity','Potenza istantanea (sensor.*)','Solo sensori classificati power; W o kW.')}${this._selector(this._selected,'icon','Icona Home Assistant (MDI)')}<div class="sp-controls"><button type="button" class="sp-btn iconbtn" data-move="-1" ${this._selected===0?'disabled':''} title="Sposta su">${spMdi('mdi:arrow-up')}</button><button type="button" class="sp-btn iconbtn" data-move="1" ${this._selected===c.plugs.length-1?'disabled':''} title="Sposta giù">${spMdi('mdi:arrow-down')}</button><button type="button" class="sp-btn" data-delete="1">Rimuovi presa</button></div></section>`;}
     }
     content+='<button type="button" class="sp-btn primary" data-add="1">+ Aggiungi presa</button>';
-    content+=this._selector('global','active_sensor','Sensore riepilogo opzionale (sensor.*)','Visualizzato separatamente: potrebbe contare prese esterne alla card.');
     if(this._error)content+=`<div class="sp-error" role="alert">${spEsc(this._error)}</div>`;
     return content;
   }
   _appearance(){const c=this._config;return '<div class="sp-heading">Aspetto Edera</div>'+
-    this._check('show_eyebrow','Mostra etichetta superiore','Nasconde o mostra SMART PLUGS CARD, senza cancellarne il testo.')+
-    this._input('eyebrow','Etichetta superiore',c.eyebrow)+
-    this._check('show_title','Mostra titolo principale','Nasconde o mostra Prese elettriche, senza cancellarne il testo.')+
-    this._input('title','Titolo principale',c.title)+
+    this._check('show_eyebrow','Mostra etichetta superiore','Nasconde o mostra l’etichetta superiore, senza cancellarne il testo.')+
+    this._input('eyebrow','Etichetta superiore',c.eyebrow,'global',!c.show_eyebrow)+
+    this._check('show_title','Mostra titolo principale','Nasconde o mostra il titolo principale, senza cancellarne il testo.')+
+    this._input('title','Titolo principale',c.title,'global',!c.show_title)+
     this._select('theme_mode','Tema',c.theme_mode,[['auto','Automatico (Home Assistant)'],['light','Edera Light'],['dark','Graphite Dark']])+
     this._select('layout','Disposizione',c.layout,[['grid','Griglia'],['list','Elenco compatto']])+
-    this._check('show_power','Mostra potenza (W)','Richiede un sensore di potenza configurato per ogni presa.')+
-    this._check('show_energy','Mostra energia (kWh)','Facoltativo: compare solo quando configurato un sensore di energia.');}
+    this._check('show_power','Mostra potenza (W)','Richiede un sensore di potenza configurato per ogni presa.');}
   _advanced(){return '<div class="sp-heading">Controlli delle prese</div><div class="sp-desc">Inizialmente la card mostra gli stati senza permettere azioni reali.</div>'+
     this._check('controls_enabled','Abilita comandi ON/OFF','Attiva le chiamate switch.turn_on / switch.turn_off sulle prese configurate.')+
     '<div class="sp-tip">Non utilizzare queste prese per controllare dispositivi con rischi di sicurezza (es. apparecchi che non devono riavviarsi automaticamente). La card non sostituisce i permessi di Home Assistant.</div>'+
@@ -299,7 +296,7 @@ class SmartPlugsCardEditor extends HTMLElement {
     this._mountSelectors();
   }
   _nativeOptions(index,key){
-    const entityKey=key==='entity'||key==='power_entity'||key==='energy_entity'||key==='active_sensor';
+    const entityKey=key==='entity'||key==='power_entity';
     if(key==='icon')return {icon:{}};
     if(!entityKey)return null;
     const domain=SP_DOMAINS[key]||'sensor';
@@ -371,4 +368,4 @@ if(typeof window!=='undefined'){
   window.customCards=window.customCards||[];
   if(!window.customCards.some(x=>x.type===SP_TAG))window.customCards.push({type:SP_TAG,name:'Smart Plugs Card',description:'Edera Smart Plugs: controlli ON/OFF, potenza e stato delle prese.',preview:true});
 }
-export {spConfig,spPlug,spState,spCount,spReading,spExternalCount};
+export {spConfig,spPlug,spState,spCount,spReading};
