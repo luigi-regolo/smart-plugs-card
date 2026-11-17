@@ -1,6 +1,6 @@
 # Smart Plugs Card
 
-[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5?style=flat-square)](https://my.home-assistant.io/redirect/hacs_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
+[![Marketplace](https://img.shields.io/badge/Marketplace-41BDF5?style=flat-square)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
 [![Release](https://img.shields.io/github/v/release/luigi-regolo/smart-plugs-card?label=Release&style=flat-square)](https://github.com/luigi-regolo/smart-plugs-card/releases/latest)
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue?style=flat-square)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/luigi-regolo/smart-plugs-card?style=flat-square)](https://github.com/luigi-regolo/smart-plugs-card/stargazers)
@@ -38,27 +38,31 @@ The available measurements and controls depend on the configured Home Assistant 
 
 ## Installation
 
-### HACS (Recommended)
+### Marketplace (Recommended)
 
-Install Smart Plugs Card directly from the default HACS catalog.
+Install Smart Plugs Card directly from the default Marketplace catalog in Home Assistant 2026.11 or newer.
 
-[![Open Smart Plugs Card in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
+[![Open Smart Plugs Card in the Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=luigi-regolo&repository=smart-plugs-card&category=plugin)
 
-1. Open **HACS** in Home Assistant.
-2. Search for **Smart Plugs Card**.
-3. Select **Smart Plugs Card** from the results.
-4. Click **Download** to install the card.
-5. Reload your dashboard if necessary.
-6. Add **Smart Plugs Card** to your dashboard and configure it using the visual editor.
+1. Go to **Settings** > **Marketplace**.
+2. The first time, accept the notice about community content.
+3. Use **Search** to find **Smart Plugs Card**.
+4. Open the repository page and select **Install**.
+5. Check the version in the dialog and select **Install** again to confirm.
+6. Reload your browser to load the new resource.
+7. Add **Smart Plugs Card** to your dashboard and configure it using the visual editor.
 
 ### Alternative: Custom repository
 
 If you prefer to add the repository manually:
 
-1. Open **HACS** and select **Custom repositories** from the menu.
-2. Enter `https://github.com/luigi-regolo/smart-plugs-card`.
-3. Select **Dashboard** as the repository type and add it.
-4. Find **Smart Plugs Card** in HACS and download it.
+1. Go to **Settings** > **Marketplace**.
+2. In the upper-right corner, select **Add from link**.
+3. Under **GitHub link**, enter `https://github.com/luigi-regolo/smart-plugs-card`.
+4. Select **Add**. If the type is not detected, select **Dashboard** under **Type** and select **Add** again.
+5. Open **Smart Plugs Card** and select **Install**.
+
+Adding a repository from a link requires a connected GitHub account. The Marketplace guides you through the connection when needed.
 
 ### Manual installation
 
@@ -127,7 +131,7 @@ The `active_sensor`, `show_energy`, and `energy_entity` options from earlier ver
 - Home Assistant with support for custom JavaScript dashboard modules.
 - A `switch.*` entity for each plug to be controlled or monitored.
 - Optional compatible `sensor.*` entities for power.
-- HACS is needed only for installation through HACS.
+- Home Assistant 2026.11 or newer only when installing from the Marketplace.
 
 No specific minimum Home Assistant version has been independently verified. The card has no additional external JavaScript libraries, dedicated paid API, or subscription requirement. Individual plug integrations may use their manufacturers' cloud services.
 
