@@ -52,18 +52,6 @@ Install Smart Plugs Card directly from the default Marketplace catalog in Home A
 6. Reload your browser to load the new resource.
 7. Add **Smart Plugs Card** to your dashboard and configure it using the visual editor.
 
-### Alternative: Custom repository
-
-If you prefer to add the repository manually:
-
-1. Go to **Settings** > **Marketplace**.
-2. In the upper-right corner, select **Add from link**.
-3. Under **GitHub link**, enter `https://github.com/luigi-regolo/smart-plugs-card`.
-4. Select **Add**. If the type is not detected, select **Dashboard** under **Type** and select **Add** again.
-5. Open **Smart Plugs Card** and select **Install**.
-
-Adding a repository from a link requires a connected GitHub account. The Marketplace guides you through the connection when needed.
-
 ### Manual installation
 
 1. Download `dist/smart-plugs-card.js` from this repository.
@@ -131,7 +119,6 @@ The `active_sensor`, `show_energy`, and `energy_entity` options from earlier ver
 - Home Assistant with support for custom JavaScript dashboard modules.
 - A `switch.*` entity for each plug to be controlled or monitored.
 - Optional compatible `sensor.*` entities for power.
-- Home Assistant 2026.11 or newer only when installing from the Marketplace.
 
 No specific minimum Home Assistant version has been independently verified. The card has no additional external JavaScript libraries, dedicated paid API, or subscription requirement. Individual plug integrations may use their manufacturers' cloud services.
 
