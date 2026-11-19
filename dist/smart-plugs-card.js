@@ -7,7 +7,7 @@ const SP_TAG = 'smart-plugs-card';
 const SP_EDITOR_TAG = 'smart-plugs-card-editor';
 const SP_TYPE = 'custom:smart-plugs-card';
 const SP_DEFAULTS = Object.freeze({
-  title: 'Prese elettriche', eyebrow: 'SMART PLUGS CARD',
+  title: null, language: 'auto', eyebrow: 'SMART PLUGS CARD',
   show_title: true, show_eyebrow: true,
   theme_mode: 'auto', layout: 'grid',
   show_power: true,
@@ -16,17 +16,153 @@ const SP_DEFAULTS = Object.freeze({
 const SP_DOMAINS = Object.freeze({entity: 'switch', power_entity: 'sensor'});
 const SP_CLASSES = Object.freeze({power_entity: 'power'});
 const SP_ICONS = Object.freeze([
-  ['mdi:power-socket-eu', 'Presa elettrica'],
-  ['mdi:washing-machine', 'Lavatrice'],
-  ['mdi:television', 'Televisore'],
-  ['mdi:coffee-maker', 'Macchina del caffè'],
-  ['mdi:desk-lamp', 'Lampada da tavolo'],
-  ['mdi:lightbulb-outline', 'Lampadina'],
-  ['mdi:power-plug', 'Spina elettrica'],
-  ['mdi:fan', 'Ventilatore'],
-  ['mdi:air-conditioner', 'Climatizzatore'],
-  ['mdi:desktop-tower-monitor', 'Computer'],
+  ['mdi:power-socket-eu', 'icSocket'],
+  ['mdi:washing-machine', 'icWasher'],
+  ['mdi:television', 'icTv'],
+  ['mdi:coffee-maker', 'icCoffee'],
+  ['mdi:desk-lamp', 'icDesk'],
+  ['mdi:lightbulb-outline', 'icBulb'],
+  ['mdi:power-plug', 'icPlug'],
+  ['mdi:fan', 'icFan'],
+  ['mdi:air-conditioner', 'icAc'],
+  ['mdi:desktop-tower-monitor', 'icPc'],
 ]);
+// Languages: Italian, English, German and French. The language follows the Home Assistant user; English is the fallback.
+const SP_LANGS = Object.freeze([['it', 'Italiano'], ['en', 'English'], ['de', 'Deutsch'], ['fr', 'Français']]);
+const SP_TR = {
+  it: {
+    defTitle: 'Prese elettriche', on: 'Prese attive', off: 'Spente', na: 'Non disp.',
+    stOn: 'Accesa', stOff: 'Spenta', stNa: 'Non disponibile', plugN: 'Presa {n}',
+    turnOn: 'Accendi', turnOff: 'Spegni', ctlOn: 'Comando presa', ctlOff: 'Abilita i comandi nella configurazione',
+    empty: 'Aggiungi una presa dall’editor visuale della card.',
+    errCmd: 'Comando non riuscito per {id}: {msg}', errHA: 'errore di Home Assistant',
+    secs: 'Configurazione Smart Plugs Card', tPlugs: 'Prese', tLook: 'Aspetto', tAdv: 'Avanzate',
+    plugsH: 'Prese elettriche', plugsD: 'Seleziona la presa da comandare, quindi i sensori facoltativi. I dati sono letti direttamente da Home Assistant.',
+    chosen: 'Presa da configurare', fName: 'Nome visualizzato', fRoom: 'Ambiente',
+    fEntity: 'Presa da comandare (switch.*)', fEntityH: 'Ricerca limitata alle entità switch.*. Ad esempio switch.macchina_presa_esempio.',
+    fPower: 'Potenza istantanea (sensor.*)', fPowerH: 'Solo sensori classificati power; W o kW.',
+    fIcon: 'Icona Home Assistant (MDI)', mvUp: 'Sposta su', mvDown: 'Sposta giù', rmPlug: 'Rimuovi presa', add: '+ Aggiungi presa',
+    remove: 'Rimuovi', removeX: 'Rimuovi {x}',
+    lookH: 'Aspetto Edera',
+    ckEye: 'Mostra etichetta superiore', ckEyeH: 'Nasconde o mostra l’etichetta superiore, senza cancellarne il testo.', fEye: 'Etichetta superiore',
+    ckTitle: 'Mostra titolo principale', ckTitleH: 'Nasconde o mostra il titolo principale, senza cancellarne il testo.', fTitle: 'Titolo principale',
+    fTheme: 'Tema', thAuto: 'Automatico (Home Assistant)', thLight: 'Edera Light', thDark: 'Graphite Dark',
+    fLayout: 'Disposizione', layGrid: 'Griglia', layList: 'Elenco compatto',
+    ckPower: 'Mostra potenza (W)', ckPowerH: 'Richiede un sensore di potenza configurato per ogni presa.',
+    lang: 'Lingua', langAuto: 'Automatica (Home Assistant)', langH: 'Automatica segue la lingua dell’utente in Home Assistant. Se la lingua non è disponibile si usa l’inglese.',
+    advH: 'Controlli delle prese', advD: 'Inizialmente la card mostra gli stati senza permettere azioni reali.',
+    ckCmd: 'Abilita comandi ON/OFF', ckCmdH: 'Attiva le chiamate switch.turn_on / switch.turn_off sulle prese configurate.',
+    tip1: 'Non utilizzare queste prese per controllare dispositivi con rischi di sicurezza (es. apparecchi che non devono riavviarsi automaticamente). La card non sostituisce i permessi di Home Assistant.',
+    tip2: 'Nessun popup né blocco dello scorrimento della pagina. Le condizioni non disponibili non vengono considerate come prese spente.',
+    selPlug: 'Seleziona la presa', noSensor: 'Nessun sensore', notFound: 'non trovato',
+    errDup: 'La presa selezionata è già configurata.',
+    icSocket: 'Presa elettrica', icWasher: 'Lavatrice', icTv: 'Televisore', icCoffee: 'Macchina del caffè', icDesk: 'Lampada da tavolo',
+    icBulb: 'Lampadina', icPlug: 'Spina elettrica', icFan: 'Ventilatore', icAc: 'Climatizzatore', icPc: 'Computer'
+  },
+  en: {
+    defTitle: 'Smart plugs', on: 'Active plugs', off: 'Off', na: 'Unavail.',
+    stOn: 'On', stOff: 'Off', stNa: 'Unavailable', plugN: 'Plug {n}',
+    turnOn: 'Turn on', turnOff: 'Turn off', ctlOn: 'Plug control', ctlOff: 'Enable the controls in the configuration',
+    empty: 'Add a plug from the card’s visual editor.',
+    errCmd: 'Command failed for {id}: {msg}', errHA: 'Home Assistant error',
+    secs: 'Smart Plugs Card settings', tPlugs: 'Plugs', tLook: 'Appearance', tAdv: 'Advanced',
+    plugsH: 'Smart plugs', plugsD: 'Select the plug to control, then the optional sensors. Data is read directly from Home Assistant.',
+    chosen: 'Plug to configure', fName: 'Display name', fRoom: 'Room',
+    fEntity: 'Plug to control (switch.*)', fEntityH: 'Search is limited to switch.* entities. For example switch.example_washing_machine.',
+    fPower: 'Instantaneous power (sensor.*)', fPowerH: 'Only sensors with the power device class; W or kW.',
+    fIcon: 'Home Assistant icon (MDI)', mvUp: 'Move up', mvDown: 'Move down', rmPlug: 'Remove plug', add: '+ Add plug',
+    remove: 'Remove', removeX: 'Remove {x}',
+    lookH: 'Edera appearance',
+    ckEye: 'Show upper label', ckEyeH: 'Shows or hides the upper label without deleting its text.', fEye: 'Upper label',
+    ckTitle: 'Show main title', ckTitleH: 'Shows or hides the main title without deleting its text.', fTitle: 'Main title',
+    fTheme: 'Theme', thAuto: 'Automatic (Home Assistant)', thLight: 'Edera Light', thDark: 'Graphite Dark',
+    fLayout: 'Layout', layGrid: 'Grid', layList: 'Compact list',
+    ckPower: 'Show power (W)', ckPowerH: 'Requires a power sensor configured for each plug.',
+    lang: 'Language', langAuto: 'Automatic (Home Assistant)', langH: 'Automatic follows the user’s language in Home Assistant. If the language is not available, English is used.',
+    advH: 'Plug controls', advD: 'At first the card shows states without allowing real actions.',
+    ckCmd: 'Enable ON/OFF commands', ckCmdH: 'Enables switch.turn_on / switch.turn_off calls on the configured plugs.',
+    tip1: 'Do not use these plugs to control devices with safety risks (e.g. appliances that must not restart automatically). The card does not replace Home Assistant permissions.',
+    tip2: 'No popup and no page scroll lock. Unavailable states are not treated as plugs that are off.',
+    selPlug: 'Select the plug', noSensor: 'No sensor', notFound: 'not found',
+    errDup: 'The selected plug is already configured.',
+    icSocket: 'Power socket', icWasher: 'Washing machine', icTv: 'Television', icCoffee: 'Coffee maker', icDesk: 'Desk lamp',
+    icBulb: 'Light bulb', icPlug: 'Power plug', icFan: 'Fan', icAc: 'Air conditioner', icPc: 'Computer'
+  },
+  de: {
+    defTitle: 'Steckdosen', on: 'Aktive Steckdosen', off: 'Aus', na: 'Nicht verf.',
+    stOn: 'An', stOff: 'Aus', stNa: 'Nicht verfügbar', plugN: 'Steckdose {n}',
+    turnOn: 'Einschalten', turnOff: 'Ausschalten', ctlOn: 'Steckdosensteuerung', ctlOff: 'Steuerung in der Konfiguration aktivieren',
+    empty: 'Fügen Sie im visuellen Editor der Karte eine Steckdose hinzu.',
+    errCmd: 'Befehl für {id} fehlgeschlagen: {msg}', errHA: 'Home-Assistant-Fehler',
+    secs: 'Einstellungen der Smart Plugs Card', tPlugs: 'Steckdosen', tLook: 'Darstellung', tAdv: 'Erweitert',
+    plugsH: 'Smarte Steckdosen', plugsD: 'Wählen Sie die zu steuernde Steckdose und anschließend die optionalen Sensoren. Die Daten werden direkt aus Home Assistant gelesen.',
+    chosen: 'Zu konfigurierende Steckdose', fName: 'Angezeigter Name', fRoom: 'Raum',
+    fEntity: 'Zu steuernde Steckdose (switch.*)', fEntityH: 'Die Suche ist auf switch.*-Entitäten beschränkt. Zum Beispiel switch.beispiel_waschmaschine.',
+    fPower: 'Momentane Leistung (sensor.*)', fPowerH: 'Nur Sensoren mit der Geräteklasse power; W oder kW.',
+    fIcon: 'Home-Assistant-Symbol (MDI)', mvUp: 'Nach oben', mvDown: 'Nach unten', rmPlug: 'Steckdose entfernen', add: '+ Steckdose hinzufügen',
+    remove: 'Entfernen', removeX: '{x} entfernen',
+    lookH: 'Edera-Darstellung',
+    ckEye: 'Obere Beschriftung anzeigen', ckEyeH: 'Blendet die obere Beschriftung ein oder aus, ohne den Text zu löschen.', fEye: 'Obere Beschriftung',
+    ckTitle: 'Haupttitel anzeigen', ckTitleH: 'Blendet den Haupttitel ein oder aus, ohne den Text zu löschen.', fTitle: 'Haupttitel',
+    fTheme: 'Design', thAuto: 'Automatisch (Home Assistant)', thLight: 'Edera Light', thDark: 'Graphite Dark',
+    fLayout: 'Anordnung', layGrid: 'Raster', layList: 'Kompakte Liste',
+    ckPower: 'Leistung anzeigen (W)', ckPowerH: 'Erfordert einen konfigurierten Leistungssensor für jede Steckdose.',
+    lang: 'Sprache', langAuto: 'Automatisch (Home Assistant)', langH: 'Automatisch folgt der Sprache des Benutzers in Home Assistant. Ist die Sprache nicht verfügbar, wird Englisch verwendet.',
+    advH: 'Steckdosensteuerung', advD: 'Zunächst zeigt die Karte nur Zustände an und erlaubt keine echten Aktionen.',
+    ckCmd: 'EIN/AUS-Befehle aktivieren', ckCmdH: 'Aktiviert switch.turn_on / switch.turn_off auf den konfigurierten Steckdosen.',
+    tip1: 'Verwenden Sie diese Steckdosen nicht zur Steuerung von Geräten mit Sicherheitsrisiken (z. B. Geräte, die nicht automatisch neu starten dürfen). Die Karte ersetzt nicht die Berechtigungen von Home Assistant.',
+    tip2: 'Kein Popup und keine Sperre des Seitenscrollens. Nicht verfügbare Zustände gelten nicht als ausgeschaltete Steckdosen.',
+    selPlug: 'Steckdose auswählen', noSensor: 'Kein Sensor', notFound: 'nicht gefunden',
+    errDup: 'Die ausgewählte Steckdose ist bereits konfiguriert.',
+    icSocket: 'Steckdose', icWasher: 'Waschmaschine', icTv: 'Fernseher', icCoffee: 'Kaffeemaschine', icDesk: 'Schreibtischlampe',
+    icBulb: 'Glühbirne', icPlug: 'Netzstecker', icFan: 'Ventilator', icAc: 'Klimaanlage', icPc: 'Computer'
+  },
+  fr: {
+    defTitle: 'Prises connectées', on: 'Prises actives', off: 'Éteintes', na: 'Indispo.',
+    stOn: 'Allumée', stOff: 'Éteinte', stNa: 'Indisponible', plugN: 'Prise {n}',
+    turnOn: 'Allumer', turnOff: 'Éteindre', ctlOn: 'Commande de la prise', ctlOff: 'Activez les commandes dans la configuration',
+    empty: 'Ajoutez une prise depuis l’éditeur visuel de la carte.',
+    errCmd: 'Échec de la commande pour {id} : {msg}', errHA: 'erreur de Home Assistant',
+    secs: 'Paramètres de la Smart Plugs Card', tPlugs: 'Prises', tLook: 'Apparence', tAdv: 'Avancé',
+    plugsH: 'Prises connectées', plugsD: 'Sélectionnez la prise à commander, puis les capteurs facultatifs. Les données sont lues directement depuis Home Assistant.',
+    chosen: 'Prise à configurer', fName: 'Nom affiché', fRoom: 'Pièce',
+    fEntity: 'Prise à commander (switch.*)', fEntityH: 'La recherche est limitée aux entités switch.*. Par exemple switch.exemple_lave_linge.',
+    fPower: 'Puissance instantanée (sensor.*)', fPowerH: 'Uniquement les capteurs de classe power ; W ou kW.',
+    fIcon: 'Icône Home Assistant (MDI)', mvUp: 'Monter', mvDown: 'Descendre', rmPlug: 'Supprimer la prise', add: '+ Ajouter une prise',
+    remove: 'Supprimer', removeX: 'Supprimer {x}',
+    lookH: 'Apparence Edera',
+    ckEye: 'Afficher l’étiquette supérieure', ckEyeH: 'Affiche ou masque l’étiquette supérieure sans effacer son texte.', fEye: 'Étiquette supérieure',
+    ckTitle: 'Afficher le titre principal', ckTitleH: 'Affiche ou masque le titre principal sans effacer son texte.', fTitle: 'Titre principal',
+    fTheme: 'Thème', thAuto: 'Automatique (Home Assistant)', thLight: 'Edera Light', thDark: 'Graphite Dark',
+    fLayout: 'Disposition', layGrid: 'Grille', layList: 'Liste compacte',
+    ckPower: 'Afficher la puissance (W)', ckPowerH: 'Nécessite un capteur de puissance configuré pour chaque prise.',
+    lang: 'Langue', langAuto: 'Automatique (Home Assistant)', langH: 'Automatique suit la langue de l’utilisateur dans Home Assistant. Si la langue n’est pas disponible, l’anglais est utilisé.',
+    advH: 'Commandes des prises', advD: 'Au départ, la carte affiche les états sans permettre d’actions réelles.',
+    ckCmd: 'Activer les commandes ON/OFF', ckCmdH: 'Active les appels switch.turn_on / switch.turn_off sur les prises configurées.',
+    tip1: 'N’utilisez pas ces prises pour commander des appareils présentant des risques de sécurité (par ex. des appareils qui ne doivent pas redémarrer automatiquement). La carte ne remplace pas les autorisations de Home Assistant.',
+    tip2: 'Aucune fenêtre contextuelle et aucun blocage du défilement de la page. Les états indisponibles ne sont pas considérés comme des prises éteintes.',
+    selPlug: 'Sélectionner la prise', noSensor: 'Aucun capteur', notFound: 'introuvable',
+    errDup: 'La prise sélectionnée est déjà configurée.',
+    icSocket: 'Prise électrique', icWasher: 'Lave-linge', icTv: 'Téléviseur', icCoffee: 'Machine à café', icDesk: 'Lampe de bureau',
+    icBulb: 'Ampoule', icPlug: 'Fiche électrique', icFan: 'Ventilateur', icAc: 'Climatiseur', icPc: 'Ordinateur'
+  }
+};
+function spT(lang, key, vars) {
+  let t = SP_TR[lang]?.[key];
+  if (t == null) t = SP_TR.en[key];
+  if (t == null) return key;
+  return vars ? t.replace(/\{(\w+)\}/g, (m, x) => (vars[x] != null ? vars[x] : m)) : t;
+}
+function spBaseLang(hass) {
+  const l = hass && ((hass.locale && hass.locale.language) || hass.language);
+  return typeof l === 'string' ? l.toLowerCase().split(/[-_]/)[0] : 'en';
+}
+function spPickLang(cfgLang, hass) {
+  const l = cfgLang && cfgLang !== 'auto' ? cfgLang : spBaseLang(hass);
+  return SP_TR[l] ? l : 'en';
+}
+// Config without the optional title when it is only the translated default.
+function spOut(config) { const o = { ...config }; if (o.title === null) delete o.title; return o; }
 function spText(value, limit=100) { return String(value ?? '').trim().slice(0, limit); }
 function spEsc(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
 function spEntity(value, domain) {
@@ -54,11 +190,12 @@ function spConfig(raw={}) {
   }
   return {
     ...legacyless, type: SP_TYPE,
-    title:spText(r.title??SP_DEFAULTS.title,60),
+    title:r.title==null?null:spText(r.title,60),
     eyebrow:spText(r.eyebrow??SP_DEFAULTS.eyebrow,60),
     show_title:r.show_title!==false, show_eyebrow:r.show_eyebrow!==false,
     theme_mode:['auto','light','dark'].includes(r.theme_mode)?r.theme_mode:'auto',
     layout:['grid','list'].includes(r.layout)?r.layout:'grid',
+    language:SP_LANGS.some(l=>l[0]===r.language)?r.language:'auto',
     show_power:r.show_power!==false,
     controls_enabled:r.controls_enabled===true,
     plugs,
@@ -144,7 +281,7 @@ ha-icon{display:inline-flex;align-items:center;justify-content:center;vertical-a
 @media(prefers-reduced-motion:reduce){.sp-toggle,.sp-thumb{transition:none!important}}
 `;
 class SmartPlugsCard extends HTMLElement {
-  static getStubConfig() {const {type,...config}=spConfig({});return config;}
+  static getStubConfig() {const {type,...config}=spOut(spConfig({}));return config;}
   static getConfigElement() {return document.createElement(SP_EDITOR_TAG);}
   constructor() {
     super();this.attachShadow({mode:'open'});this._config=spConfig();this._hass=null;
@@ -159,23 +296,26 @@ class SmartPlugsCard extends HTMLElement {
   set hass(hass){this._hass=hass;this._render();}
   getCardSize(){return Math.max(2,Math.ceil(this._config.plugs.filter(p=>p.entity).length/(this._config.layout==='list'?1:2))*2+2);}
   _entity(id){return id?this._hass?.states?.[id]:null;}
+  _lang(){return spPickLang(this._config.language,this._hass);}
+  _t(k,v){return spT(this._lang(),k,v);}
+  _num(){return new Intl.NumberFormat(this._lang(),{maximumFractionDigits:1});}
   _dark(){return this._config.theme_mode==='dark'||(this._config.theme_mode==='auto'&&(this._hass?.themes?.darkMode===true ||(!this._hass?.themes&&this._media?.matches)));}
   _row(p,index){
     const state=spState(this._entity(p.entity)),on=state===true;
     const entity=this._entity(p.entity);
-    const name=p.name||spText(entity?.attributes?.friendly_name,60)||`Presa ${index+1}`;
+    const name=p.name||spText(entity?.attributes?.friendly_name,60)||this._t('plugN',{n:index+1});
     const icon=p.icon || spIcon(entity?.attributes?.icon);
     const watt=spReading(this._entity(p.power_entity),'power');
-    const watts=this._config.show_power ? `<div class="sp-reading"><strong data-watt>${watt===null?'—':spEsc(new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(watt.value))}</strong><span>W</span></div>` : '';
-    const label=state===null?'Non disponibile':on?'Accesa':'Spenta';
+    const watts=this._config.show_power ? `<div class="sp-reading"><strong data-watt>${watt===null?'—':spEsc(this._num().format(watt.value))}</strong><span>W</span></div>` : '';
+    const label=this._t(state===null?'stNa':on?'stOn':'stOff');
     const disabled=!this._config.controls_enabled || state===null || typeof this._hass?.callService!=='function';
     const pending=this._busy.has(p.entity);
-    return `<article class="sp-plug ${state===null?'unknown':on?'on':'off'}" data-plug-id="${spEsc(p.entity)}"><span class="sp-orb">${spMdi(icon)}</span><span class="sp-names"><strong class="sp-name" title="${spEsc(name)}">${spEsc(name)}</strong>${p.room?`<small title="${spEsc(p.room)}">${spEsc(p.room)}</small>`:''}</span><button type="button" class="sp-toggle" role="switch" aria-checked="${on}" aria-disabled="${disabled||pending}" data-switch="${spEsc(p.entity)}" aria-label="${spEsc(on?'Spegni':'Accendi')} ${spEsc(name)}" ${disabled?'disabled':''} title="${this._config.controls_enabled?'Comando presa':'Abilita i comandi nella configurazione'}"><span class="sp-thumb"></span></button><div class="sp-meta"><span class="sp-state"><span class="sp-dot"></span><span data-state-text>${label}</span></span>${watts}</div></article>`;
+    return `<article class="sp-plug ${state===null?'unknown':on?'on':'off'}" data-plug-id="${spEsc(p.entity)}"><span class="sp-orb">${spMdi(icon)}</span><span class="sp-names"><strong class="sp-name" title="${spEsc(name)}">${spEsc(name)}</strong>${p.room?`<small title="${spEsc(p.room)}">${spEsc(p.room)}</small>`:''}</span><button type="button" class="sp-toggle" role="switch" aria-checked="${on}" aria-disabled="${disabled||pending}" data-switch="${spEsc(p.entity)}" aria-label="${spEsc(this._t(on?'turnOff':'turnOn'))} ${spEsc(name)}" ${disabled?'disabled':''} title="${spEsc(this._t(this._config.controls_enabled?'ctlOn':'ctlOff'))}"><span class="sp-thumb"></span></button><div class="sp-meta"><span class="sp-state"><span class="sp-dot"></span><span data-state-text>${label}</span></span>${watts}</div></article>`;
   }
   // Changes to configuration or theme require a structural render.
   // Entity updates and switch actions update existing nodes without replacing
   // Shadow DOM, preserving scroll position, touch focus and element geometry.
-  _structureKey(){return JSON.stringify([this._config,this._dark()]);}
+  _structureKey(){return JSON.stringify([this._config,this._dark(),this._lang()]);}
   _refreshLive(){
     const root=this.shadowRoot.querySelector('.sp-root');if(!root)return;
     const c=this._config, plugs=c.plugs.filter(p=>p.entity);
@@ -190,14 +330,14 @@ class SmartPlugsCard extends HTMLElement {
       if(!row)continue;
       const state=spState(this._entity(p.entity)),on=state===true;
       row.classList.toggle('on',on);row.classList.toggle('off',state===false);row.classList.toggle('unknown',state===null);
-      const status=row.querySelector('[data-state-text]');if(status)status.textContent=state===null?'Non disponibile':on?'Accesa':'Spenta';
-      const name=p.name||spText(this._entity(p.entity)?.attributes?.friendly_name,60)||`Presa ${index+1}`;
+      const status=row.querySelector('[data-state-text]');if(status)status.textContent=this._t(state===null?'stNa':on?'stOn':'stOff');
+      const name=p.name||spText(this._entity(p.entity)?.attributes?.friendly_name,60)||this._t('plugN',{n:index+1});
       const nameEl=row.querySelector('.sp-name');if(nameEl){nameEl.textContent=name;nameEl.title=name;}
-      const wattEl=row.querySelector('[data-watt]');if(wattEl){const data=spReading(this._entity(p.power_entity),'power');wattEl.textContent=data===null?'—':new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(data.value);}
+      const wattEl=row.querySelector('[data-watt]');if(wattEl){const data=spReading(this._entity(p.power_entity),'power');wattEl.textContent=data===null?'—':this._num().format(data.value);}
       const btn=row.querySelector('[data-switch]');if(btn){
         const blocked=!c.controls_enabled||state===null||typeof this._hass?.callService!=='function';
         btn.disabled=blocked;btn.setAttribute('aria-disabled',String(blocked||this._busy.has(p.entity)));
-        btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-label',`${on?'Spegni':'Accendi'} ${name}`);
+        btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-label',`${this._t(on?'turnOff':'turnOn')} ${name}`);
       }
     }
     const warning=root.querySelector('[data-error-note]');
@@ -211,8 +351,9 @@ class SmartPlugsCard extends HTMLElement {
     }
     const c=this._config,availablePlugs=c.plugs.filter(p=>p.entity),count=spCount(availablePlugs,this._hass?.states);
     const heading=c.show_eyebrow&&c.eyebrow?`<div class="sp-eyebrow">${spEsc(c.eyebrow)}</div>`:'';
-    const title=c.show_title&&c.title?`<div class="sp-title">${spEsc(c.title)}<span>.</span></div>`:'';
-    this.shadowRoot.innerHTML=`<style>${SP_CSS}</style><div class="sp-root ${this._dark()?'sp-dark':''}">${heading||title?`<header class="sp-head">${heading}${title}</header>`:''}<div class="sp-summary"><div class="sp-summary-cell major"><strong data-count="on">${count.on}</strong><span>Prese attive</span></div><div class="sp-summary-cell"><strong data-count="off">${count.off}</strong><span>Spente</span></div><div class="sp-summary-cell${count.other?' warn':''}" data-cell="other"><strong data-count="other">${count.other}</strong><span>Non disp.</span></div></div><div class="sp-grid-host">${availablePlugs.length?`<div class="sp-grid ${c.layout==='list'?'sp-list':''}">${availablePlugs.map((p,i)=>this._row(p,i)).join('')}</div>`:'<div class="sp-empty">Aggiungi una presa dall’editor visuale della card.</div>'}</div><div class="sp-warning" data-error-note role="alert" hidden></div></div>`;
+    const titleText=c.title==null?this._t('defTitle'):c.title;
+    const title=c.show_title&&titleText?`<div class="sp-title">${spEsc(titleText)}<span>.</span></div>`:'';
+    this.shadowRoot.innerHTML=`<style>${SP_CSS}</style><div class="sp-root ${this._dark()?'sp-dark':''}">${heading||title?`<header class="sp-head">${heading}${title}</header>`:''}<div class="sp-summary"><div class="sp-summary-cell major"><strong data-count="on">${count.on}</strong><span>${spEsc(this._t('on'))}</span></div><div class="sp-summary-cell"><strong data-count="off">${count.off}</strong><span>${spEsc(this._t('off'))}</span></div><div class="sp-summary-cell${count.other?' warn':''}" data-cell="other"><strong data-count="other">${count.other}</strong><span>${spEsc(this._t('na'))}</span></div></div><div class="sp-grid-host">${availablePlugs.length?`<div class="sp-grid ${c.layout==='list'?'sp-list':''}">${availablePlugs.map((p,i)=>this._row(p,i)).join('')}</div>`:`<div class="sp-empty">${spEsc(this._t('empty'))}</div>`}</div><div class="sp-warning" data-error-note role="alert" hidden></div></div>`;
     this._structureSignature=structureKey;
     this._refreshLive();
   }
@@ -224,7 +365,7 @@ class SmartPlugsCard extends HTMLElement {
     if(typeof this._hass?.callService!=='function')return;
     const action=state?'turn_off':'turn_on';this._busy.add(id);this._error='';this._refreshLive();
     try{await this._hass.callService('switch',action,{entity_id:id});}
-    catch(err){this._error=`Comando non riuscito per ${id}: ${err?.message||'errore di Home Assistant'}`;}
+    catch(err){this._error=this._t('errCmd',{id,msg:err?.message||this._t('errHA')});}
     finally{this._busy.delete(id);this._refreshLive();}
   }
 }
@@ -244,7 +385,10 @@ class SmartPlugsCardEditor extends HTMLElement {
     this.shadowRoot.addEventListener('change',e=>this._change(e));
   }
   connectedCallback(){this._render();this._ensureSelectors();}
-  set hass(hass){this._hass=hass;if(!customElements.get('ha-selector'))this._render();else this.shadowRoot.querySelectorAll('ha-selector').forEach(el=>el.hass=hass);}
+  _lang(){return spPickLang(this._config.language,this._hass);}
+  _t(k,v){return spT(this._lang(),k,v);}
+  // The first Home Assistant object tells which language the user speaks: redraw once with the right texts.
+  set hass(hass){this._hass=hass;if(!customElements.get('ha-selector')||this._renderedLang!==this._lang())this._render();else this.shadowRoot.querySelectorAll('ha-selector').forEach(el=>el.hass=hass);}
   setConfig(raw){const next=spConfig(raw);if(JSON.stringify(next)===JSON.stringify(this._config)&&this.shadowRoot.querySelector('.sp-editor'))return;this._config=next;this._selected=Math.min(this._selected,Math.max(0,next.plugs.length-1));this._render();}
   async _ensureSelectors(){
     if(this._nativeRequested)return;this._nativeRequested=true;
@@ -254,45 +398,47 @@ class SmartPlugsCardEditor extends HTMLElement {
     }
     this._render();
   }
-  _emit(){this.dispatchEvent(new CustomEvent('config-changed',{detail:{config:this._config},bubbles:true,composed:true}));}
+  _emit(){this.dispatchEvent(new CustomEvent('config-changed',{detail:{config:spOut(this._config)},bubbles:true,composed:true}));}
   _update(patch){this._config=spConfig({...this._config,...patch});this._error='';this._emit();this._render();}
   _updatePlug(index,patch){if(index<0||index>=this._config.plugs.length)return;const plugs=this._config.plugs.map((p,i)=>i===index?{...p,...patch}:p);this._update({plugs});}
   _field(label,content,help=''){return `<div class="sp-field"><label class="sp-label">${spEsc(label)}</label>${content}${help?`<p class="sp-help">${spEsc(help)}</p>`:''}</div>`;}
   _input(key,label,value,index='global',disabled=false){return this._field(label,`<input class="sp-input" data-index="${index}" data-key="${key}" type="text" maxlength="80" value="${spEsc(value)}" ${disabled?'disabled':''}/>`);}
-  _select(key,label,value,options){return this._field(label,`<select class="sp-input" data-index="global" data-key="${key}">${options.map(([v,t])=>`<option value="${spEsc(v)}" ${v===value?'selected':''}>${spEsc(t)}</option>`).join('')}</select>`);}
+  _select(key,label,value,options,help=''){return this._field(label,`<select class="sp-input" data-index="global" data-key="${key}">${options.map(([v,t])=>`<option value="${spEsc(v)}" ${v===value?'selected':''}>${spEsc(t)}</option>`).join('')}</select>`,help);}
   _check(key,label,help){return `<label class="sp-cbrow"><span><strong>${spEsc(label)}</strong><small>${spEsc(help)}</small></span><input type="checkbox" data-index="global" data-key="${key}" ${this._config[key]?'checked':''}/></label>`;}
   _selector(index,key,label,help=''){
     const c=index==='global'?this._config:this._config.plugs[Number(index)];const value=c?.[key]||'';
-    return this._field(label,`<div class="sp-controlrow"><div class="sp-grow" data-slot="${index}:${key}"></div>${value?`<button type="button" class="sp-btn iconbtn" data-clear="${index}:${key}" title="Rimuovi" aria-label="Rimuovi ${spEsc(label)}">${spMdi('mdi:close')}</button>`:''}</div>`,help);
+    return this._field(label,`<div class="sp-controlrow"><div class="sp-grow" data-slot="${index}:${key}"></div>${value?`<button type="button" class="sp-btn iconbtn" data-clear="${index}:${key}" title="${spEsc(this._t('remove'))}" aria-label="${spEsc(this._t('removeX',{x:label}))}">${spMdi('mdi:close')}</button>`:''}</div>`,help);
   }
   _plugs(){
-    const c=this._config;
-    let content='<div class="sp-heading">Prese elettriche</div><div class="sp-desc">Seleziona la presa da comandare, quindi i sensori facoltativi. I dati sono letti direttamente da Home Assistant.</div>';
+    const c=this._config,t=(k,v)=>this._t(k,v);
+    let content=`<div class="sp-heading">${spEsc(t('plugsH'))}</div><div class="sp-desc">${spEsc(t('plugsD'))}</div>`;
     if(c.plugs.length){
-      content+=`<div class="sp-field"><label class="sp-label" for="sp-chosen">Presa da configurare</label><select id="sp-chosen" class="sp-input" data-special="selected">${c.plugs.map((p,i)=>`<option value="${i}" ${i===this._selected?'selected':''}>${spEsc(p.name||p.entity||`Presa ${i+1}`)}</option>`).join('')}</select></div>`;
+      content+=`<div class="sp-field"><label class="sp-label" for="sp-chosen">${spEsc(t('chosen'))}</label><select id="sp-chosen" class="sp-input" data-special="selected">${c.plugs.map((p,i)=>`<option value="${i}" ${i===this._selected?'selected':''}>${spEsc(p.name||p.entity||t('plugN',{n:i+1}))}</option>`).join('')}</select></div>`;
       const p=c.plugs[this._selected];
-      if(p){content+=`<section class="sp-entry">${this._input('name','Nome visualizzato',p.name,this._selected)}${this._input('room','Ambiente',p.room,this._selected)}${this._selector(this._selected,'entity','Presa da comandare (switch.*)','Ricerca limitata alle entità switch.*. Ad esempio switch.macchina_presa_esempio.')}${this._selector(this._selected,'power_entity','Potenza istantanea (sensor.*)','Solo sensori classificati power; W o kW.')}${this._selector(this._selected,'icon','Icona Home Assistant (MDI)')}<div class="sp-controls"><button type="button" class="sp-btn iconbtn" data-move="-1" ${this._selected===0?'disabled':''} title="Sposta su">${spMdi('mdi:arrow-up')}</button><button type="button" class="sp-btn iconbtn" data-move="1" ${this._selected===c.plugs.length-1?'disabled':''} title="Sposta giù">${spMdi('mdi:arrow-down')}</button><button type="button" class="sp-btn" data-delete="1">Rimuovi presa</button></div></section>`;}
+      if(p){content+=`<section class="sp-entry">${this._input('name',t('fName'),p.name,this._selected)}${this._input('room',t('fRoom'),p.room,this._selected)}${this._selector(this._selected,'entity',t('fEntity'),t('fEntityH'))}${this._selector(this._selected,'power_entity',t('fPower'),t('fPowerH'))}${this._selector(this._selected,'icon',t('fIcon'))}<div class="sp-controls"><button type="button" class="sp-btn iconbtn" data-move="-1" ${this._selected===0?'disabled':''} title="${spEsc(t('mvUp'))}">${spMdi('mdi:arrow-up')}</button><button type="button" class="sp-btn iconbtn" data-move="1" ${this._selected===c.plugs.length-1?'disabled':''} title="${spEsc(t('mvDown'))}">${spMdi('mdi:arrow-down')}</button><button type="button" class="sp-btn" data-delete="1">${spEsc(t('rmPlug'))}</button></div></section>`;}
     }
-    content+='<button type="button" class="sp-btn primary" data-add="1">+ Aggiungi presa</button>';
+    content+=`<button type="button" class="sp-btn primary" data-add="1">${spEsc(t('add'))}</button>`;
     if(this._error)content+=`<div class="sp-error" role="alert">${spEsc(this._error)}</div>`;
     return content;
   }
-  _appearance(){const c=this._config;return '<div class="sp-heading">Aspetto Edera</div>'+
-    this._check('show_eyebrow','Mostra etichetta superiore','Nasconde o mostra l’etichetta superiore, senza cancellarne il testo.')+
-    this._input('eyebrow','Etichetta superiore',c.eyebrow,'global',!c.show_eyebrow)+
-    this._check('show_title','Mostra titolo principale','Nasconde o mostra il titolo principale, senza cancellarne il testo.')+
-    this._input('title','Titolo principale',c.title,'global',!c.show_title)+
-    this._select('theme_mode','Tema',c.theme_mode,[['auto','Automatico (Home Assistant)'],['light','Edera Light'],['dark','Graphite Dark']])+
-    this._select('layout','Disposizione',c.layout,[['grid','Griglia'],['list','Elenco compatto']])+
-    this._check('show_power','Mostra potenza (W)','Richiede un sensore di potenza configurato per ogni presa.');}
-  _advanced(){return '<div class="sp-heading">Controlli delle prese</div><div class="sp-desc">Inizialmente la card mostra gli stati senza permettere azioni reali.</div>'+
-    this._check('controls_enabled','Abilita comandi ON/OFF','Attiva le chiamate switch.turn_on / switch.turn_off sulle prese configurate.')+
-    '<div class="sp-tip">Non utilizzare queste prese per controllare dispositivi con rischi di sicurezza (es. apparecchi che non devono riavviarsi automaticamente). La card non sostituisce i permessi di Home Assistant.</div>'+
-    '<div class="sp-tip">Nessun popup né blocco dello scorrimento della pagina. Le condizioni non disponibili non vengono considerate come prese spente.</div>';}
+  _appearance(){const c=this._config,t=(k,v)=>this._t(k,v);return `<div class="sp-heading">${spEsc(t('lookH'))}</div>`+
+    this._check('show_eyebrow',t('ckEye'),t('ckEyeH'))+
+    this._input('eyebrow',t('fEye'),c.eyebrow,'global',!c.show_eyebrow)+
+    this._check('show_title',t('ckTitle'),t('ckTitleH'))+
+    this._input('title',t('fTitle'),c.title==null?t('defTitle'):c.title,'global',!c.show_title)+
+    this._select('theme_mode',t('fTheme'),c.theme_mode,[['auto',t('thAuto')],['light',t('thLight')],['dark',t('thDark')]])+
+    this._select('layout',t('fLayout'),c.layout,[['grid',t('layGrid')],['list',t('layList')]])+
+    this._check('show_power',t('ckPower'),t('ckPowerH'))+
+    this._select('language',t('lang'),c.language,[['auto',t('langAuto')],...SP_LANGS],t('langH'));}
+  _advanced(){const t=(k,v)=>this._t(k,v);return `<div class="sp-heading">${spEsc(t('advH'))}</div><div class="sp-desc">${spEsc(t('advD'))}</div>`+
+    this._check('controls_enabled',t('ckCmd'),t('ckCmdH'))+
+    `<div class="sp-tip">${spEsc(t('tip1'))}</div>`+
+    `<div class="sp-tip">${spEsc(t('tip2'))}</div>`;}
   _render(){
     if(!this.isConnected)return;
-    const tabs=[['plugs','Prese'],['appearance','Aspetto'],['advanced','Avanzate']];
-    this.shadowRoot.innerHTML=`<style>${SP_EDITOR_CSS}</style><div class="sp-editor"><nav class="sp-tabs" aria-label="Configurazione Smart Plugs Card">${tabs.map(([id,label])=>`<button type="button" class="sp-tab ${this._tab===id?'active':''}" data-tab="${id}">${label}</button>`).join('')}</nav>${this._tab==='plugs'?this._plugs():this._tab==='appearance'?this._appearance():this._advanced()}</div>`;
+    this._renderedLang=this._lang();
+    const tabs=[['plugs',this._t('tPlugs')],['appearance',this._t('tLook')],['advanced',this._t('tAdv')]];
+    this.shadowRoot.innerHTML=`<style>${SP_EDITOR_CSS}</style><div class="sp-editor"><nav class="sp-tabs" aria-label="${spEsc(this._t('secs'))}">${tabs.map(([id,label])=>`<button type="button" class="sp-tab ${this._tab===id?'active':''}" data-tab="${id}">${spEsc(label)}</button>`).join('')}</nav>${this._tab==='plugs'?this._plugs():this._tab==='appearance'?this._appearance():this._advanced()}</div>`;
     this._mountSelectors();
   }
   _nativeOptions(index,key){
@@ -316,18 +462,18 @@ class SmartPlugsCardEditor extends HTMLElement {
         });slot.appendChild(native);
       }else if(key==='icon'){
         const select=document.createElement('select');select.className='sp-input';
-        for(const [id,label] of SP_ICONS){const opt=document.createElement('option');opt.value=id;opt.textContent=`${label} (${id})`;select.appendChild(opt);}
+        for(const [id,labelKey] of SP_ICONS){const opt=document.createElement('option');opt.value=id;opt.textContent=`${this._t(labelKey)} (${id})`;select.appendChild(opt);}
         select.value=SP_ICONS.some(x=>x[0]===value)?value:SP_ICONS[0][0];
         select.addEventListener('change',()=>this._entityChanged(idx,key,select.value));slot.appendChild(select);
       }else{
         const select=document.createElement('select');select.className='sp-input';
-        const blank=document.createElement('option');blank.value='';blank.textContent=key==='entity'?'Seleziona la presa':'Nessun sensore';select.appendChild(blank);
+        const blank=document.createElement('option');blank.value='';blank.textContent=this._t(key==='entity'?'selPlug':'noSensor');select.appendChild(blank);
         const options=Object.entries(this._hass?.states||{}).filter(([id,entity])=>{
           const domain=SP_DOMAINS[key]||'sensor';return id.startsWith(domain+'.')&&(!SP_CLASSES[key]||entity.attributes?.device_class===SP_CLASSES[key]);
         }).sort((a,b)=>a[0].localeCompare(b[0]));
         for(const [id,entity] of options){const opt=document.createElement('option');opt.value=id;opt.textContent=`${entity.attributes?.friendly_name||id} (${id})`;select.appendChild(opt);}
         // Unknown existing entity is kept visible until user changes it.
-        if(value&&!options.some(([id])=>id===value)){const option=document.createElement('option');option.value=value;option.textContent=value+' (non trovato)';select.appendChild(option);}
+        if(value&&!options.some(([id])=>id===value)){const option=document.createElement('option');option.value=value;option.textContent=`${value} (${this._t('notFound')})`;select.appendChild(option);}
         select.value=value;select.addEventListener('change',()=>this._entityChanged(idx,key,select.value));slot.appendChild(select);
       }
     }
@@ -339,7 +485,7 @@ class SmartPlugsCardEditor extends HTMLElement {
     const index=Number(idx); if(!this._config.plugs[index])return;
     if(this._config.plugs[index][key]===value)return;
     if(key==='entity'&&value&&this._config.plugs.some((p,i)=>i!==index&&p.entity===value)){
-      this._error='La presa selezionata è già configurata.';this._render();return;
+      this._error=this._t('errDup');this._render();return;
     }
     this._updatePlug(index,{[key]:value});
   }
@@ -366,6 +512,6 @@ if(typeof customElements!=='undefined'){
 }
 if(typeof window!=='undefined'){
   window.customCards=window.customCards||[];
-  if(!window.customCards.some(x=>x.type===SP_TAG))window.customCards.push({type:SP_TAG,name:'Smart Plugs Card',description:'Edera Smart Plugs: controlli ON/OFF, potenza e stato delle prese.',preview:true});
+  if(!window.customCards.some(x=>x.type===SP_TAG))window.customCards.push({type:SP_TAG,name:'Smart Plugs Card',description:'Edera smart plugs card with ON/OFF controls, power readings and status.',preview:true});
 }
 export {spConfig,spPlug,spState,spCount,spReading};

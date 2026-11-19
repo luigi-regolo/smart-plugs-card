@@ -19,7 +19,9 @@ It displays each configured plug's current state, provides optional on/off contr
 
 ![Smart Plugs Card in compact list layout, Dark mode](assets/smart-plugs-card-list-dark.png)
 
-*Previews use fictional demo data. Names and readings depend on your Home Assistant configuration. The interface text is currently in Italian.*
+![Smart Plugs Card — Italian, English, German and French](assets/smart-plugs-card-languages.png)
+
+*Previews use fictional demo data, including the four interface languages (Italian, English, German and French). Names and readings depend on your Home Assistant configuration.*
 
 ## Features
 
@@ -29,6 +31,7 @@ It displays each configured plug's current state, provides optional on/off contr
 - **State summary:** Show how many configured plugs are on, off, or unavailable.
 - **Power monitoring:** Display instantaneous power in W when a compatible `sensor.*` entity is configured (`W` and `kW` supported).
 - **Visual configuration:** Native Home Assistant entity selectors when available, with an entity-list fallback.
+- **Four languages:** Italian, English, German and French. The language follows your Home Assistant profile (English when yours is not available) or can be set in the editor.
 - **Edera appearance:** Automatic, Light, and Graphite Dark themes; a subtle green tile highlight for active plugs in Light mode, and neutral tiles with green switches in Dark mode; compact iOS-style switches; configurable Home Assistant MDI icons.
 - **Optional headings:** Show or hide the upper label and main title independently.
 - **Responsive design:** Compact grid that adapts from two to four columns to the available card width, from smartphones to desktops, with a separate compact list option.
@@ -69,10 +72,14 @@ If the `www` directory has just been created, Home Assistant may need a restart 
 After adding the card, use the editor sections:
 
 - **Plugs:** Add smart plugs, select their controllable `switch.*` entities, set display names and rooms, choose MDI icons, and optionally assign a power sensor.
-- **Appearance:** Show or hide either heading, change their text, choose Automatic/Light/Dark appearance, switch between grid and compact list, and show or hide the W reading.
+- **Appearance:** Show or hide either heading, change their text, choose Automatic/Light/Dark appearance, switch between grid and compact list, show or hide the W reading, and select the language.
 - **Advanced:** Enable the real on/off controls. Controls are **disabled by default**.
 
 The entity pickers restrict plug controls to `switch.*` entities and power sensors to `sensor.*` entities with the power device class.
+
+### Language
+
+The card is available in Italian, English, German and French. By default it follows the language of the Home Assistant user profile and uses English when that language is not available. To force a language, choose it in the **Appearance** tab or set the `language` option.
 
 ### Example YAML configuration
 
@@ -102,10 +109,11 @@ Replace the example entities with entities actually present in Home Assistant. T
 
 | Option | Description |
 |---|---|
-| `title` / `eyebrow` | Main title and upper label. |
+| `title` / `eyebrow` | Main title and upper label. When no title is set, the default title is shown in the card language. |
 | `show_title` / `show_eyebrow` | Show or hide the two headings independently. |
 | `theme_mode` | `auto`, `light`, or `dark`. |
 | `layout` | `grid` or `list`. |
+| `language` | `auto` (default, follows the Home Assistant language), `it`, `en`, `de`, or `fr`. |
 | `show_power` | Show the optional power value. |
 | `controls_enabled` | Enable real on/off commands; defaults to `false`. |
 | `plugs` | List of individually configured smart plugs. |
